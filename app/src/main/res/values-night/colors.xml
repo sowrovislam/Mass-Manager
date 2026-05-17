@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Dark version of your color -->
+    <color name="primaryColor">#00838F</color>
+
+    <!-- Dark Background -->
+    <color name="background">#121212</color>
+
+    <!-- Light Text -->
+    <color name="textColor">#FFFFFF</color>
+
+
+</resources>
