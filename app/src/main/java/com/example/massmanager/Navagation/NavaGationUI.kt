@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.massmanager.Login_File.ForgateScreen
 import com.example.massmanager.Login_File.LoginScreen
+import com.example.massmanager.Login_File.SignupScreen
 import com.example.massmanager.Login_File.SplashScreen
 
 @Composable
@@ -26,13 +28,21 @@ fun NavigationUI() {
             LoginScreen(navController)
         }
 
-        composable(Screen.Home.route) {
-//            HomeScreen(navController)
+        composable(Screen.Signup.route) {
+            SignupScreen(navController)
+        }
+
+
+        composable(Screen.Signup.route) {
+            ForgateScreen(navController)
         }
     }
 }
     sealed class Screen(val route: String) {
         object Splash : Screen("SplashScreen")
         object Login : Screen("LoginScreen")
-        object Home : Screen("HomeScreen")
+
+        object Signup: Screen("SignupScreen")
+
+        object ForgateScreen: Screen("ForgateScreen")
     }

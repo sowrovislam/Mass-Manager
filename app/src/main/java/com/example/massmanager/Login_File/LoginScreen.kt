@@ -1,4 +1,5 @@
 package com.example.massmanager.Login_File
+
 import android.widget.ToggleButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,11 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,7 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -51,10 +58,13 @@ fun LoginScreen(navController: NavController) {
     var rememberMe by remember { mutableStateOf(false) }
     var isChecked by remember { mutableStateOf(false) }
 
+    var isLoading by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(colorResource(R.color.background))
             .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -62,12 +72,13 @@ fun LoginScreen(navController: NavController) {
     ) {
 
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(50.dp))
         Text(
             text = "Welcome back",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(start = 5.dp),
             textAlign = TextAlign.Start,
             color = colorResource(R.color.textColor)
@@ -85,7 +96,6 @@ fun LoginScreen(navController: NavController) {
         // Toggle Button (User / Admin)
 
 
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,7 +107,9 @@ fun LoginScreen(navController: NavController) {
             // User Button
             Button(
                 onClick = { selectedTab = "user" },
-                modifier = Modifier.weight(1f).padding(2.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (selectedTab == "user") Color(0xFF0D5C63) else Color.Transparent,
                     contentColor = if (selectedTab == "user") Color.White else Color.Black
@@ -113,7 +125,9 @@ fun LoginScreen(navController: NavController) {
             // Admin Button
             Button(
                 onClick = { selectedTab = "admin" },
-                modifier = Modifier.weight(1f).padding(2.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (selectedTab == "admin") Color(0xFF0D5C63) else Color.Transparent,
                     contentColor = if (selectedTab == "admin") Color.White else Color.Black
@@ -125,7 +139,7 @@ fun LoginScreen(navController: NavController) {
             }
         }
 
-            // Start Login  Code
+        // Start Login  Code
         Spacer(modifier = Modifier.height(40.dp))
 
         Column(
@@ -143,8 +157,15 @@ fun LoginScreen(navController: NavController) {
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Enter Email") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_email_24),
+                        contentDescription = "email icon"
+                    )
+                }
+                )
+
 
 
 
@@ -160,7 +181,13 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Enter Password") },
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_password_24),
+                        contentDescription = "email icon"
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -172,6 +199,19 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 color = colorResource(id = R.color.textColor)
             )
+
+            // hare show err  smss
+            Text(
+                text = "",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth(),
+                color = colorResource(id = R.color.textColor)
+            )
+
+
+
+
 
             Spacer(modifier = Modifier.height(18.dp))
             Row(
@@ -190,101 +230,100 @@ fun LoginScreen(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(18.dp))
             Button(
-                onClick = { },
+                onClick = {
+                    // 2. Use the scope here inside the event handler
+                    isLoading = true
+                    scope.launch {
+                        try {
+                            // Simulate a network login request (e.g., 2 seconds)
+                            delay(2000)
+
+                            // Navigate to your home/dashboard screen on success
+                            // navController.navigate("home")
+                        } catch (e: Exception) {
+                            // Handle login error
+                        } finally {
+                            isLoading = false
+                        }
+                    }
+                },
+                enabled = !isLoading, // Disable the button while loading
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 50.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.primaryColor)// Green color
+                    containerColor = colorResource(R.color.primaryColor)
                 )
             ) {
                 Text(
-                    "Login ->",
+                    text = "Login ->",
                     fontSize = 18.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
             }
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 1.dp,
-                    color = Color.LightGray
-                )
-
-                Text(
-                    text = "Or continue with",
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 1.dp,
-                    color = Color.LightGray
-                )
-            }
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Text(
-                    text = "New to the market? ",
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
-
-                TextButton(
-                    onClick = {
-                        // Navigate Signup Screen
-//                        navController.navigate("signup")
-                    }
-                ) {
-                    Text(
-                        text = "Sign up",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF8A00)
-                    )
-                }
-            }
-
-
-
-
-
-
         }
 
+        Spacer(modifier = Modifier.height(28.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                thickness = 1.dp,
+                color = Color.LightGray
+            )
+
+            Text(
+                text = "Or continue with",
+                modifier = Modifier.padding(horizontal = 12.dp),
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                thickness = 1.dp,
+                color = Color.LightGray
+            )
+        }
+
+        Spacer(modifier = Modifier.height(28.dp))
 
 
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
+            Text(
+                text = "New to the market? ",
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
 
+            TextButton(
+                onClick = {
 
+                    navController.navigate(Screen.Signup.route)
+                }
+            ) {
+                Text(
+                    text = "Sign up",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFFF8A00),
 
-
-
-
-
-
-
+                    )
+            }
+        }
 
 
     }
@@ -295,7 +334,7 @@ fun LoginScreen(navController: NavController) {
 @Preview(showSystemUi = true)
 @Composable
 fun loginui() {
-    val navController= rememberNavController()
+    val navController = rememberNavController()
 
     LoginScreen(navController)
 }
