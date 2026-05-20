@@ -1,9 +1,11 @@
 package com.example.massmanager.Navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.massmanager.Api_Otp.Data_Class.OtpViewModel
 import com.example.massmanager.Login_File.ForgateScreen
 import com.example.massmanager.Login_File.LoginScreen
 import com.example.massmanager.Login_File.SignupScreen
@@ -14,6 +16,7 @@ fun NavigationUI() {
 
     val isLoggedIn = true
     val navController = rememberNavController()
+//    val viewModel: OtpViewModel= viewModel()
 
     NavHost(
         navController = navController,
@@ -29,11 +32,12 @@ fun NavigationUI() {
         }
 
         composable(Screen.Signup.route) {
-            SignupScreen(navController)
+            val viewModel: OtpViewModel = viewModel()
+            SignupScreen(navController,viewModel)
         }
 
 
-        composable(Screen.Signup.route) {
+        composable(Screen.Forgate.route) {
             ForgateScreen(navController)
         }
     }
@@ -44,5 +48,5 @@ fun NavigationUI() {
 
         object Signup: Screen("SignupScreen")
 
-        object ForgateScreen: Screen("ForgateScreen")
+        object Forgate: Screen("ForgateScreen")
     }
