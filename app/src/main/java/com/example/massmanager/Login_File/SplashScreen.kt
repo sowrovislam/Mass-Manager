@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
 import kotlinx.coroutines.delay
@@ -26,7 +28,7 @@ import kotlinx.coroutines.delay
 fun SplashScreen(navController: NavController) {
 
     var startAnimation by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     val scale by animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0.5f,
         animationSpec = tween(1000),
@@ -47,6 +49,52 @@ fun SplashScreen(navController: NavController) {
             popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }
+
+
+
+
+
+    LaunchedEffect(Unit) {
+        startAnimation = true
+        delay(2000)
+
+        val sessionManager = SessionManager(context)
+
+        if (sessionManager.isLoggedIn()) {
+
+            navController.navigate("dashboard") {
+                popUpTo("splash") { inclusive = true }
+            }
+
+        } else {
+
+            navController.navigate("login") {
+                popUpTo("splash") { inclusive = true }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     Box(
         modifier = Modifier

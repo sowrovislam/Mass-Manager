@@ -1,7 +1,9 @@
 package com.example.massmanager.Login_File
 
+import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,12 +19,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
@@ -43,15 +49,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.massmanager.Api_Otp.Data_Class.LoginViewModel
+import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
 
-
+    val context= LocalContext.current
     var selectedTab by remember { mutableStateOf("user") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -60,6 +68,29 @@ fun LoginScreen(navController: NavController) {
 
     var isLoading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    val loading by viewModel.loading.collectAsState()
+    val message by viewModel.message.collectAsState()
+    val success by viewModel.success.collectAsState()
+    val user by viewModel.user.collectAsState()
+
+
+
+
+
+
+
+    LaunchedEffect(success) {
+        if (success) {
+            navController.navigate(Screen.dashboard.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
+
+
+
+
 
 
     Column(
@@ -164,7 +195,7 @@ fun LoginScreen(navController: NavController) {
                         contentDescription = "email icon"
                     )
                 }
-                )
+            )
 
 
 
@@ -182,7 +213,7 @@ fun LoginScreen(navController: NavController) {
                 label = { Text("Enter Password") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        leadingIcon = {
+                leadingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.baseline_password_24),
                         contentDescription = "email icon"
@@ -196,8 +227,17 @@ fun LoginScreen(navController: NavController) {
                 text = "Forgot Password?",
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
-                modifier = Modifier.fillMaxWidth(),
-                color = colorResource(id = R.color.textColor)
+
+                color = colorResource(id = R.color.textColor),
+                modifier = Modifier.fillMaxWidth()
+                    .clickable{
+
+                        navController.navigate(Screen.Forgate.route)
+
+
+
+                    }
+
             )
 
             // hare show err  smss
@@ -231,23 +271,46 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(18.dp))
             Button(
                 onClick = {
-                    // 2. Use the scope here inside the event handler
-                    isLoading = true
-                    scope.launch {
-                        try {
-                            // Simulate a network login request (e.g., 2 seconds)
-                            delay(2000)
 
-                            // Navigate to your home/dashboard screen on success
-                            // navController.navigate("home")
-                        } catch (e: Exception) {
-                            // Handle login error
-                        } finally {
-                            isLoading = false
+                    val isEmailEmpty = email.isBlank()
+                    val isPasswordEmpty = password.isBlank()
+                    val isTermsNotAccepted = !isChecked
+
+                    if (isEmailEmpty || isPasswordEmpty) {
+                        Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    if (isTermsNotAccepted) {
+                        Toast.makeText(context, "Accept Terms & Conditions", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    when (selectedTab) {
+
+                        "admin" -> {
+                            val sessionManager = SessionManager(context)
+                            sessionManager.saveLogin()
+
+                            viewModel.admin_login(email, password)
+                            Toast.makeText(context, "${message}", Toast.LENGTH_SHORT).show()
+                        }
+
+                        "user" -> {
+//                            viewModel.userLogin(email, password)
+
+                            Toast.makeText(context, "User Login", Toast.LENGTH_SHORT).show()
+
+                            navController.navigate("user_home")
+                        }else -> {
+
+                            loading==false
+
+                        Toast.makeText(context, "Not Login", Toast.LENGTH_SHORT).show()
                         }
                     }
+
                 },
-                enabled = !isLoading, // Disable the button while loading
+                enabled = !loading, // Disable the button while loading
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 50.dp),
@@ -257,7 +320,7 @@ fun LoginScreen(navController: NavController) {
                 )
             ) {
                 Text(
-                    text = "Login ->",
+                    text = if (loading) "Loading..." else "Login ->",
                     fontSize = 18.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -326,6 +389,48 @@ fun LoginScreen(navController: NavController) {
         }
 
 
+
+
+
+
+
+        if (loading) {
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
 
@@ -335,6 +440,6 @@ fun LoginScreen(navController: NavController) {
 @Composable
 fun loginui() {
     val navController = rememberNavController()
-
-    LoginScreen(navController)
+     val viewModel= LoginViewModel()
+    LoginScreen(navController,viewModel)
 }

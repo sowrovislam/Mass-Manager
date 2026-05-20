@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.massmanager.Navigation.NavigationUI
 
@@ -21,9 +22,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MassManagerTheme {
+val context= LocalContext.current
 
-
-                NavigationUI()
+                NavigationUI(context)
 
             }
         }

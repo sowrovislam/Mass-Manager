@@ -1,26 +1,40 @@
 package com.example.massmanager.Navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.massmanager.Api_Otp.Data_Class.LoginViewModel
 import com.example.massmanager.Api_Otp.Data_Class.OtpViewModel
+import com.example.massmanager.Dashboard.dashboardScreen
 import com.example.massmanager.Login_File.ForgateScreen
 import com.example.massmanager.Login_File.LoginScreen
 import com.example.massmanager.Login_File.SignupScreen
 import com.example.massmanager.Login_File.SplashScreen
 
 @Composable
-fun NavigationUI() {
+fun NavigationUI(context: Context) {
 
-    val isLoggedIn = true
+
+    val pref = context.getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
+    val isLoggedIn = pref.getBoolean("isLoggedIn", false)
+
+    val start = if (isLoggedIn) Screen.dashboard.route else Screen.Login.route
+
+
+
+
     val navController = rememberNavController()
-//    val viewModel: OtpViewModel= viewModel()
+    val viewModel: OtpViewModel= viewModel()
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) Screen.Splash.route else Screen.Login.route
+        startDestination =  start
+
+//        if (isLoggedIn) Screen.Splash.route else Screen.Login.route
     ) {
 
         composable(Screen.Splash.route) {
@@ -28,7 +42,8 @@ fun NavigationUI() {
         }
 
         composable(Screen.Login.route) {
-            LoginScreen(navController)
+            val viewModel: LoginViewModel=viewModel()
+            LoginScreen(navController, viewModel)
         }
 
         composable(Screen.Signup.route) {
@@ -40,6 +55,18 @@ fun NavigationUI() {
         composable(Screen.Forgate.route) {
             ForgateScreen(navController)
         }
+
+
+
+        composable(Screen.dashboard.route) {
+            dashboardScreen(navController)
+        }
+
+
+
+
+
+
     }
 }
     sealed class Screen(val route: String) {
@@ -49,4 +76,6 @@ fun NavigationUI() {
         object Signup: Screen("SignupScreen")
 
         object Forgate: Screen("ForgateScreen")
+
+        object dashboard: Screen("dashboardScreen")
     }

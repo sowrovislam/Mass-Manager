@@ -119,23 +119,6 @@ fun SignupScreen(navController: NavController, viewModel: OtpViewModel) {
                 .padding(horizontal = 16.dp)
         ) {
 
-            Text(text = "Username*", color = colorResource(R.color.textColor))
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Enter Monitor Name") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.outline_person_24),
-                        contentDescription = "email icon"
-                    )
-                })
             //User Name
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -295,6 +278,26 @@ fun SignupScreen(navController: NavController, viewModel: OtpViewModel) {
 
 
 
+            Text(text = "Username*", color = colorResource(R.color.textColor))
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Enter Monitor Name") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.outline_person_24),
+                        contentDescription = "email icon"
+                    )
+                })
+
+
+            Spacer(modifier = Modifier.height(20.dp))
             Text(text = "Phone*", color = colorResource(R.color.textColor))
 
             OutlinedTextField(
