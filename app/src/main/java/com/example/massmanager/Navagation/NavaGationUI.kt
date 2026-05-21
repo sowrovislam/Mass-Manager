@@ -22,7 +22,7 @@ fun NavigationUI(context: Context) {
     val pref = context.getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
     val isLoggedIn = pref.getBoolean("isLoggedIn", false)
 
-    val start = if (isLoggedIn) Screen.dashboard.route else Screen.Login.route
+    val start = if (isLoggedIn) Screen.Splash.route else Screen.Login.route
 
 
 
@@ -32,9 +32,7 @@ fun NavigationUI(context: Context) {
 
     NavHost(
         navController = navController,
-        startDestination =  start
-
-//        if (isLoggedIn) Screen.Splash.route else Screen.Login.route
+        startDestination = Screen.Splash.route
     ) {
 
         composable(Screen.Splash.route) {

@@ -14,11 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
@@ -27,10 +29,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
 
-    var startAnimation by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var startAnimation by remember { mutableStateOf(false) }
+
+    // 🔥 Smooth animation
     val scale by animateFloatAsState(
-        targetValue = if (startAnimation) 1f else 0.5f,
+        targetValue = if (startAnimation) 1f else 0.8f,
         animationSpec = tween(1000),
         label = ""
     )
@@ -41,73 +45,39 @@ fun SplashScreen(navController: NavController) {
         label = ""
     )
 
+    // 🔥 Navigation handled safely
     LaunchedEffect(Unit) {
+
         startAnimation = true
-        delay(2000)
 
-        navController.navigate(Screen.Login.route) {
-            popUpTo(Screen.Splash.route) { inclusive = true }
-        }
-    }
-
-
-
-
-
-    LaunchedEffect(Unit) {
-        startAnimation = true
-        delay(2000)
+        delay(1500)
 
         val sessionManager = SessionManager(context)
 
         if (sessionManager.isLoggedIn()) {
-
-            navController.navigate("dashboard") {
-                popUpTo("splash") { inclusive = true }
+            navController.navigate(Screen.dashboard.route) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
             }
-
         } else {
-
-            navController.navigate("login") {
-                popUpTo("splash") { inclusive = true }
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
             }
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // 🔥 UI
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.background)),
+            .background(Color.White), // safe background
         contentAlignment = Alignment.Center
     ) {
 
         Image(
-            painter = painterResource(id = R.drawable.mass_manager), // ✅ FIX THIS
+            painter = painterResource(id = R.drawable.mass_manager),
             contentDescription = "App Logo",
             modifier = Modifier
-                .size(200.dp)
+                .size(180.dp)
                 .clip(CircleShape)
                 .scale(scale)
                 .alpha(alpha)
