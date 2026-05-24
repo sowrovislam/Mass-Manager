@@ -39,6 +39,29 @@ interface ApiService {
         @Field("password") password: String
     ): Response<LoginResponse>
 
+    @FormUrlEncoded
+    @POST("users_signup.php") // your php file name
+    suspend fun signupUser(
+
+        @Field("name") name: String,
+        @Field("email") email: String,
+        @Field("number") number: String,
+        @Field("password") password: String,
+        @Field("usersid") usersid: Int
+
+    ): Response<UserList>
+
+
+
+
+
+    @FormUrlEncoded
+    @POST("users_login.php")
+    suspend fun users_login(
+        @Field("email") email: String,
+        @Field("password") password: String
+    ): UsersLogin
+
 }
 
 object RetrofitClient {

@@ -1,7 +1,7 @@
 package com.example.massmanager.Login_File
 
+import android.util.Log
 import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,17 +46,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.Api_Otp.Data_Class.LoginViewModel
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
+import com.example.massmanager.Api_Otp.Data_Class.SignUpViewModel
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
+
+//    val viewMode: SignUpViewModel = viewModel()
+
 
     val context= LocalContext.current
     var selectedTab by remember { mutableStateOf("user") }
@@ -74,11 +77,7 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
     val success by viewModel.success.collectAsState()
     val user by viewModel.user.collectAsState()
 
-
-
-
-
-
+    Log.d("USER_NAME", user?.id.toString())
 
     LaunchedEffect(success) {
         if (success) {
@@ -87,10 +86,17 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
             }
         }
     }
+    val loginData = viewModel.loginState.value
 
+    val success1 = loginData != null && loginData.status == "success"
 
-
-
+    LaunchedEffect(success1) {
+        if (success1) {
+            navController.navigate(Screen.dashboard.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
 
 
     Column(
@@ -229,11 +235,11 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
                 textAlign = TextAlign.End,
 
                 color = colorResource(id = R.color.textColor),
-                modifier = Modifier.fillMaxWidth()
-                    .clickable{
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
 
                         navController.navigate(Screen.Forgate.route)
-
 
 
                     }
@@ -288,19 +294,23 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
                     when (selectedTab) {
 
                         "admin" -> {
-                            val sessionManager = SessionManager(context)
-                            sessionManager.saveLogin()
 
-                            viewModel.admin_login(email, password)
+//                            val UserId= user?.id
+//                            val UserName= user?.name.toString()
+//                            val sessionManager = SessionManager(context)
+//                            sessionManager.saveLogin(UserId, UserName)
+
+                            viewModel.admin_login(email, password,context)
                             Toast.makeText(context, "${message}", Toast.LENGTH_SHORT).show()
                         }
 
                         "user" -> {
-//                            viewModel.userLogin(email, password)
+
+                            viewModel.user_login(email,password,context)
+
 
                             Toast.makeText(context, "User Login", Toast.LENGTH_SHORT).show()
 
-                            navController.navigate("user_home")
                         }else -> {
 
                             loading==false

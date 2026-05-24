@@ -1,11 +1,17 @@
 package com.example.massmanager.Api_Otp.Data_Class
 
+import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 class LoginViewModel : ViewModel() {
+
+
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
@@ -19,7 +25,7 @@ class LoginViewModel : ViewModel() {
     private val _user = MutableStateFlow<UserData?>(null)
     val user: StateFlow<UserData?> = _user
 
-    fun admin_login(email: String, password: String) {
+    fun admin_login(email: String, password: String,context: Context) {
 
         viewModelScope.launch {
             _loading.value = true
@@ -37,6 +43,11 @@ class LoginViewModel : ViewModel() {
                     if (body.status == "success") {
                         _success.value = true
                         _user.value = body.data
+
+                        val sessionManager = SessionManager(context)
+                        sessionManager.saveLogin(body.data?.id, body.data!!.name)
+
+
                     } else {
                         _success.value = false
                     }
@@ -54,4 +65,60 @@ class LoginViewModel : ViewModel() {
             _loading.value = false
         }
     }
+
+
+
+
+
+    private val repository = AuthRepository()
+
+    var loginState = mutableStateOf<UsersLogin?>(null)
+    var errorMessage = mutableStateOf("")
+    var isLoading = mutableStateOf(false)
+
+    fun user_login(email: String, password: String,context: Context) {
+        viewModelScope.launch {
+            try {
+                isLoading.value = true
+
+                val response = repository.user_login(email, password)
+
+                if (response.status == "success") {
+                    loginState.value = response
+
+                    val sessionManager = SessionManager(context)
+                    sessionManager.saveLogin(response.user_id, response.name)
+
+
+                } else {
+                    errorMessage.value = response.message
+
+
+
+                }
+
+            } catch (e: Exception) {
+                errorMessage.value = e.message ?: "Error"
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

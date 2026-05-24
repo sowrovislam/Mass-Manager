@@ -8,25 +8,36 @@ class SessionManager(context: Context) {
     private val pref =
         context.getSharedPreferences("USER_SESSION", Context.MODE_PRIVATE)
 
-    // Save Login
-    fun saveLogin() {
+    // ✅ Save Login
+    fun saveLogin(userId: Int?, name: String) {
+        val editor = pref.edit()
 
-        pref.edit()
-            .putBoolean("isLoggedIn", true)
-            .apply()
+        if (userId != null) {
+            editor.putInt("user_id", userId)
+            editor.putBoolean("isLoggedIn", true)
+        }
+
+        editor.putString("user_name", name)
+        editor.apply()
     }
 
-    // Check Login
+    // ✅ Check Login
     fun isLoggedIn(): Boolean {
-
         return pref.getBoolean("isLoggedIn", false)
     }
 
-    // Logout
-    fun logout() {
+    // ✅ Get User ID
+    fun getUserId(): Int {
+        return pref.getInt("user_id", -1)
+    }
 
-        pref.edit()
-            .clear()
-            .apply()
+    // ✅ Get User Name (you missed this)
+    fun getUserName(): String? {
+        return pref.getString("user_name", null)
+    }
+
+    // ✅ Logout
+    fun logout() {
+        pref.edit().clear().apply()
     }
 }

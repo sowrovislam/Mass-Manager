@@ -23,9 +23,30 @@ data class LoginResponse(
     val data: UserData? = null
 )
 
+
+
+
 data class UserData(
-    val id: String,
+    val id: Int,
     val name: String,
     val email: String,
     val number: String
+)
+data class UserList(
+    val name: String,
+    val email: String,
+    val number: String,
+    val password: String,
+    val usersid: String
+)
+
+
+
+
+data class UsersLogin(
+    val status: String,
+    val message: String,
+    val user_id: Int,
+    val name: String,
+    val email: String
 )

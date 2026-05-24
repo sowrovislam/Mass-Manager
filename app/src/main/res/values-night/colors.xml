@@ -3,6 +3,7 @@
 
     <!-- Dark version of your color -->
     <color name="primaryColor">#00838F</color>
+    <color name="bac">#201A30</color>
 
     <!-- Dark Background -->
     <color name="background">#121212</color>
