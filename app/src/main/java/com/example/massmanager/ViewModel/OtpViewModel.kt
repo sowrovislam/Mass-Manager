@@ -1,7 +1,9 @@
-package com.example.massmanager.Api_Otp.Data_Class
+package com.example.massmanager.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.massmanager.Api_Otp.Data_Class.AuthRepository
+import com.example.massmanager.Api_Otp.Data_Class.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

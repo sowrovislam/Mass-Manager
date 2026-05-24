@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.massmanager.Api_Otp.Data_Class.OtpViewModel
+import com.example.massmanager.ViewModel.OtpViewModel
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
 import kotlinx.coroutines.delay

@@ -50,9 +50,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.massmanager.Api_Otp.Data_Class.LoginViewModel
+import com.example.massmanager.ViewModel.LoginViewModel
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
-import com.example.massmanager.Api_Otp.Data_Class.SignUpViewModel
+import com.example.massmanager.ViewModel.SignUpViewModel
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
 

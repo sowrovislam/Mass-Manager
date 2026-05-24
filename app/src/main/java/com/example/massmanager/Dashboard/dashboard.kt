@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.massmanager.Api_Otp.Data_Class.LoginViewModel
+import com.example.massmanager.ViewModel.LoginViewModel
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.Login_File.LoginScreen
 import com.example.massmanager.Navigation.Screen
@@ -67,8 +67,6 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
 
 
 
-
-
                 NavigationDrawerItem(
                     label = { Text("Logout") },
                     selected = false,
@@ -79,6 +77,33 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                         }
                     }
                 )
+
+                NavigationDrawerItem(
+                    label = { Text("Daly mill") },
+                    selected = false,
+                    onClick = {
+                        session.logout()
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             }
         }
     ) {
@@ -182,11 +207,13 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-
+                   val id= sessionManager.getUserId()
 
 
                     when (selectedIndex) {
-                        0 -> Text("Home Screen")
+                        0 ->
+                            Text("Home Screen")
+
                         1 -> Text("Profile Screen")
                         2 ->  navController.navigate(Screen.Users.route)
                     }
@@ -207,6 +234,8 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text("I Love You ❤️${sessionManager.getUserId()}")
+
+                    Text("I Love You ❤️${sessionManager.getUserName()}")
                 }
             }
         }

@@ -7,9 +7,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.massmanager.Api_Otp.Data_Class.LoginViewModel
-import com.example.massmanager.Api_Otp.Data_Class.OtpViewModel
-import com.example.massmanager.Api_Otp.Data_Class.SignUpViewModel
+import com.example.massmanager.ViewModel.LoginViewModel
+import com.example.massmanager.ViewModel.OtpViewModel
+import com.example.massmanager.ViewModel.SignUpViewModel
 import com.example.massmanager.Dashboard.ProfileScreen
 import com.example.massmanager.Dashboard.UserScreen
 import com.example.massmanager.Dashboard.dashboardScreen

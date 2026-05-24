@@ -33,13 +33,14 @@ data class UserData(
     val number: String
 )
 data class UserList(
+    val status: String,
+    val message: String,
     val name: String,
     val email: String,
     val number: String,
     val password: String,
     val usersid: String
 )
-
 
 
 

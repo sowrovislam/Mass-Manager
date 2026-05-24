@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
-import com.example.massmanager.Api_Otp.Data_Class.SignUpViewModel
+import com.example.massmanager.ViewModel.SignUpViewModel
 import com.example.massmanager.R
 
 @Composable
@@ -55,8 +56,17 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
     var password by remember { mutableStateOf("") }
     val loading by viewModel.loading.collectAsState()
     val context = LocalContext.current
+    val message by viewModel.message.collectAsState()
 
-
+    LaunchedEffect(message) {
+        if (message.isNotEmpty()) {
+            userName = ""
+            email = ""
+            phone = ""
+            password = ""
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -84,15 +94,13 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
         Spacer(modifier = Modifier.height(25.dp))
 
         Text(
-            text = "নিবন্ধন বন্ধ করা হয়েছে " +
-                    "নতুন অ্যাকাউন্ট শুধুমাত্র অ্যাডমিন তৈরি করতে পারবেন।" +
-                    "অ্যাক্সেস পাওয়ার জন্য অনুগ্রহ করে অ্যাডমিনের সাথে যোগাযোগ করুন।",
+            text = "নতুন ইউজার নিবন্ধন শুধুমাত্র অ্যাডমিনের মাধ্যমে করা যাবে।" +"অ্যাকাউন্টের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন ধন্যবাদ।",
             maxLines = 1,
             modifier = Modifier.basicMarquee(),
             color = Color.Red,
             fontSize = 30.sp
         )
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Column(
             modifier = Modifier.padding(20.dp),
@@ -117,7 +125,7 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
 
             )
 
-            Spacer(modifier = Modifier.height(12.dp)) // Slightly increased spacing for aesthetic breathing room
+            Spacer(modifier = Modifier.height(16.dp)) // Slightly increased spacing for aesthetic breathing room
 
             // Email
             OutlinedTextField(
@@ -139,7 +147,7 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
 
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Phone Number
             OutlinedTextField(
@@ -183,7 +191,7 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
                 shape = RoundedCornerShape(16.dp),
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             if (loading) {
                 Box(
@@ -196,20 +204,33 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
                 }
             }
 
+
             // Create User Button
             Button(
                 onClick = {
                     if (userName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-                        Toast.makeText(context, "Fill in the blank fields", Toast.LENGTH_LONG).show()
-                    } else {
-                        val sessionManager = SessionManager(context)
-                        val userId = sessionManager.getUserId()
 
-                        viewModel.signup(userName, email, phone, password, userId)
-                        userName = ""
-                        email = ""
-                        phone = ""
-                        password = ""
+                        Toast.makeText(context, "Fill in the blank fields", Toast.LENGTH_LONG).show()
+
+                    } else {
+
+                        val sessionManager = SessionManager(context)
+
+                        val adminId = sessionManager.adminId()
+                        val currentUserId = sessionManager.getUserId()
+
+                        val isAdmin = adminId == currentUserId
+
+                        // 👉 যদি শুধু admin signup করতে পারে
+                        if (!isAdmin) {
+                            Toast.makeText(context, "Only admin can create account", Toast.LENGTH_LONG).show()
+                            return@Button
+                        }
+
+                        // 🔥 API Call
+                        viewModel.signup(userName, email, phone, password, adminId)
+                        Toast.makeText(context, "${message}", Toast.LENGTH_LONG).show()
+
                     }
                 },
                 enabled = !loading,

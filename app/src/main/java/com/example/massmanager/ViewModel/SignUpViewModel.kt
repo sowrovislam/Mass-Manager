@@ -1,8 +1,8 @@
-package com.example.massmanager.Api_Otp.Data_Class
+package com.example.massmanager.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
+import com.example.massmanager.Api_Otp.Data_Class.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class SignUpViewModel : ViewModel() {
                         // ✅ proper response handling
                         val body = response.body()
 
-//                        _message.value = body?.message ?: "Signup Success"
+                        _message.value = body?.message ?: "Signup Success"
 
                     } else {
 

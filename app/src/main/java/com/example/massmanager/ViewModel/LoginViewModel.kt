@@ -1,14 +1,18 @@
-package com.example.massmanager.Api_Otp.Data_Class
+package com.example.massmanager.ViewModel
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.massmanager.Api_Otp.Data_Class.AuthRepository
+import com.example.massmanager.Api_Otp.Data_Class.RetrofitClient
+import com.example.massmanager.Api_Otp.Data_Class.SessionManager
+import com.example.massmanager.Api_Otp.Data_Class.UserData
+import com.example.massmanager.Api_Otp.Data_Class.UsersLogin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+
 class LoginViewModel : ViewModel() {
 
 
@@ -45,7 +49,10 @@ class LoginViewModel : ViewModel() {
                         _user.value = body.data
 
                         val sessionManager = SessionManager(context)
-                        sessionManager.saveLogin(body.data?.id, body.data!!.name)
+                        sessionManager.saveLogin(body.data?.id, body.data!!.email)
+
+
+                        sessionManager.save(body.data.id,body.data.email)
 
 
                     } else {
