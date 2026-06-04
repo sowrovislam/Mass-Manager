@@ -1,26 +1,21 @@
 package com.example.massmanager.Login_File
 
+import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.massmanager.Api_Otp.Data_Class.NetworkMonitor
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
@@ -30,9 +25,15 @@ import kotlinx.coroutines.delay
 fun SplashScreen(navController: NavController) {
 
     val context = LocalContext.current
-    var startAnimation by remember { mutableStateOf(false) }
+    val activity = context as Activity
 
-    // 🔥 Smooth animation
+    val networkMonitor = remember { NetworkMonitor(context) }
+    val isConnected by networkMonitor.isConnected.collectAsState()
+
+    var startAnimation by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var navigated by remember { mutableStateOf(false) }
+
     val scale by animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0.8f,
         animationSpec = tween(1000),
@@ -45,14 +46,27 @@ fun SplashScreen(navController: NavController) {
         label = ""
     )
 
-    // 🔥 Navigation handled safely
+    // Start network + animation
     LaunchedEffect(Unit) {
-
+        networkMonitor.start()
         startAnimation = true
+    }
 
-        delay(1500)
+    // Main splash logic
+    LaunchedEffect(isConnected) {
+
+        if (navigated) return@LaunchedEffect
+
+        delay(1200)
+
+        if (!isConnected) {
+            showDialog = true
+            return@LaunchedEffect
+        }
 
         val sessionManager = SessionManager(context)
+
+        navigated = true
 
         if (sessionManager.isLoggedIn()) {
             navController.navigate(Screen.dashboard.route) {
@@ -65,22 +79,29 @@ fun SplashScreen(navController: NavController) {
         }
     }
 
-    // 🔥 UI
+    // UI Dialog
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("No Internet ❌") },
+            text = { Text("Please turn on internet connection") },
+            confirmButton = {
+                TextButton(onClick = { activity.finish() }) {
+                    Text("Exit")
+                }
+            }
+        )
+    }
+
+    // Splash UI
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White), // safe background
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-
         Image(
             painter = painterResource(id = R.drawable.mass_manager),
-            contentDescription = "App Logo",
-            modifier = Modifier
-                .size(180.dp)
-                .clip(CircleShape)
-                .scale(scale)
-                .alpha(alpha)
+            contentDescription = null,
+            modifier = Modifier.size(180.dp)
         )
     }
 }

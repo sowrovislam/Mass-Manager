@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MassManagerTheme {
-val context= LocalContext.current
+                val context = LocalContext.current
 
                 NavigationUI(context)
 
