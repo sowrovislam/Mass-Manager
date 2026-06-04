@@ -51,3 +51,23 @@ data class UsersLogin(
     val name: String,
     val email: String
 )
+
+
+data class ScheduleResponse(
+    val status: String,
+    val searched_id: String,
+    val admin_match: Int,
+    val user_match: Int,
+    val total_found: Int,
+    val start_date_used: String,
+    val today: String,
+    val schedule: List<ScheduleItem>
+)
+
+data class ScheduleItem(
+    val name: String,
+    val email: String,
+    val number: String,
+    val start_date: String,
+    val end_date: String
+)

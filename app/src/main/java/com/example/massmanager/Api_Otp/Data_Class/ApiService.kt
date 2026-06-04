@@ -62,6 +62,19 @@ interface ApiService {
         @Field("password") password: String
     ): UsersLogin
 
+
+    @FormUrlEncoded
+    @POST("get_total_count.php")
+    suspend fun getSchedule(
+        @Field("id") id: Int,
+        @Field("start_date") startDate: String? = null
+    ): ScheduleResponse
+
+
+
+
+
+
 }
 
 object RetrofitClient {

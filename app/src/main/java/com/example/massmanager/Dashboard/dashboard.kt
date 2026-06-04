@@ -60,11 +60,23 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
 
                 NavigationDrawerItem(
                     label = { Text("Dashboard") },
-                    selected = true,
+                    selected = false,
                     onClick = { },
                     modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                 )
 
+
+
+                NavigationDrawerItem(
+                    label = { Text("Bazar Shdule") },
+                    selected = false,
+                    onClick = {
+                        navController.navigate(Screen.Shdule.route) {
+
+                        }
+                    },
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                )
 
 
                 NavigationDrawerItem(
@@ -75,21 +87,9 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
-                    }
+                    },
+                        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                 )
-
-                NavigationDrawerItem(
-                    label = { Text("Daly mill") },
-                    selected = false,
-                    onClick = {
-                        session.logout()
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
-                )
-
-
 
 
 
