@@ -71,7 +71,16 @@ interface ApiService {
     ): ScheduleResponse
 
 
-
+    @FormUrlEncoded
+    @POST("save_meals.php")
+    suspend fun addMeal(
+        @Field("userid") userid: String,
+        @Field("name") name: String,
+        @Field("date") date: String,
+        @Field("counter") counter: String,
+        @Field("isDupur") isDupur: String,
+        @Field("isRat") isRat: String
+    ): MealResponse
 
 
 

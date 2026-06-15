@@ -5,16 +5,55 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     <color name="bac">#FFFFFF</color>
-    <color name="primaryColor">#00535B</color>
 
-    <!-- Background -->
-    <color name="background">#FFFFFF</color>
+
 
     <!-- Text -->
     <color name="textColor">#000000</color>
+
+
+
+    <color name="status_bar_green">#06420C</color>
+
+    <!-- ================= BASE ================= -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- ================= PRIMARY ================= -->
+    <color name="primaryColor">#00535B</color>
+    <color name="primary_dark">#00363B</color>
+    <color name="primary_light">#2E8C94</color>
+
+    <!-- ================= BACKGROUND ================= -->
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#F5F7F6</color>
+    <color name="card_background">#E8F5E9</color>
+
+    <!-- ================= TEXT ================= -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#555555</color>
+    <color name="text_hint">#888888</color>
+
+    <!-- ================= STATUS COLORS ================= -->
+    <color name="success">#07A40C</color>
+    <color name="warning">#FFB300</color>
+    <color name="error">#D32F2F</color>
+    <color name="info">#2196F3</color>
+
+    <!-- ================= UI COLORS ================= -->
+    <color name="divider">#1A2E7D32</color>
+    <color name="icon_tint">#2E7D32</color>
+    <color name="fab_color">#00535B</color>
+
+    <!-- ================= GREEN VARIANTS ================= -->
+    <color name="green_50">#E8F5E9</color>
+    <color name="green_100">#C8E6C9</color>
+    <color name="green_200">#A5D6A7</color>
+    <color name="green_500">#4CAF50</color>
+    <color name="green_700">#388E3C</color>
+    <color name="green_900">#1B5E20</color>
+
 
 
 </resources>

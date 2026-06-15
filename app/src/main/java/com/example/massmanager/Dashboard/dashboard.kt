@@ -1,5 +1,6 @@
 package com.example.massmanager.Dashboard
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,31 +11,61 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.ViewModel.LoginViewModel
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.Login_File.LoginScreen
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
+import com.example.massmanager.ViewModel.ScheduleViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
+fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) {
+    val today by viewModel.todayItem.collectAsState()
 
     val context = LocalContext.current
     val session = SessionManager(context)
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val loading by viewModel.loading.collectAsState()
     val sessionManager = SessionManager(context)
     sessionManager.getUserId()
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    LaunchedEffect(Unit) {
+        viewModel.load(sessionManager.getUserId()) // শুধু id দিলেই হবে
+//         viewModel.load(id, "2026-06-10") // optional date
+    }
+
+
+
+            val view = LocalView.current
+
+    val statusBarColor = colorResource(R.color.status_bar_green)// same as your theme green
+
+    SideEffect {
+        val window = (view.context as Activity).window
+
+        window.statusBarColor = statusBarColor.toArgb()
+
+        WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = false
+    }
 
 
 
@@ -61,7 +92,11 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                 NavigationDrawerItem(
                     label = { Text("Dashboard") },
                     selected = false,
-                    onClick = { },
+                    onClick = {
+                        scope.launch {
+                            drawerState.close()   // 👈 Close drawer
+                        }
+                    },
                     modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                 )
 
@@ -70,12 +105,16 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                 NavigationDrawerItem(
                     label = { Text("Bazar Shdule") },
                     selected = false,
+
                     onClick = {
+                        scope.launch {
+                            drawerState.close()   // 👈 Close drawer
+                        }
                         navController.navigate(Screen.Shdule.route) {
 
                         }
                     },
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp),
                 )
 
 
@@ -83,25 +122,16 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                     label = { Text("Logout") },
                     selected = false,
                     onClick = {
+                        scope.launch {
+                            drawerState.close()   // 👈 Close drawer
+                        }
                         session.logout()
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
                     },
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                 )
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             }
@@ -112,6 +142,12 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
             topBar = {
                 TopAppBar(
                     title = { Text("Dashboard") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorResource(R.color.status_bar_green), // SAME as status bar
+                        titleContentColor = Color.White,
+                        actionIconContentColor = Color.White,
+                        navigationIconContentColor = Color.White
+                    ),
                     actions = {
 
                         // 🔔 Notification Icon
@@ -124,7 +160,7 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                             )
                         }
                         IconButton(onClick = {
-                      navController.navigate(Screen.Profile.route)
+                            navController.navigate(Screen.Profile.route)
                         }) {
                             Image(
                                 painter = painterResource(id = R.drawable.img_1),
@@ -136,7 +172,7 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
                             )
                         }
 
-                 },
+                    },
 
                     navigationIcon = {
                         IconButton(onClick = {
@@ -157,94 +193,413 @@ fun dashboardScreen(navController: NavController,viewModel: LoginViewModel) {
             // 🔥 BOTTOM NAVIGATION
             bottomBar = {
 
-                NavigationBar(modifier = Modifier
-                    .padding(12.dp)
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                ) {
+                val routes = listOf(
+                    Screen.dashboard.route,
+                    Screen.Meal.route,
+                    Screen.Users.route
+                )
 
+                val containerColor = Color(0xFF06420C)
+                val selectedColor = Color(0xFF07A40C)
+                val unselectedColor = Color(0xFFECEBE7)
+                NavigationBar(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(containerColor),
+                    containerColor = Color.Transparent,
+                    tonalElevation = 0.dp
+                ) {
                     items.forEachIndexed { index, item ->
+                        // এখানে routes[index] এর সাথে মিলানো হচ্ছে
+                        val selected = currentRoute == routes[index]
 
                         NavigationBarItem(
-                            selected = selectedIndex == index,
-                            onClick = { selectedIndex = index },
+                            selected = selected,
+                            onClick = {
+                                if (selected) return@NavigationBarItem
 
-                            icon = {
-                                when (index) {
-                                    0 -> Icon(
-                                        painter = painterResource(id = R.drawable.baseline_home_24),
-                                        contentDescription = null)
-
-                                    1 -> Icon(
-                                        painter = painterResource(id = R.drawable.outline_menu_book_2_24),
-                                        contentDescription = null
-
-                                    )
-
-                                    else -> Icon(
-                                        painter = painterResource(id = R.drawable.outline_person_24),
-                                        contentDescription = null
-                                    )
+                                navController.navigate(routes[index]) {
+                                    // এটি প্রথম স্ক্রিনে ব্যাক করা নিশ্চিত করে
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
                             },
-
-                            label = { Text(item) }
+                            icon = {
+                                Icon(
+                                    painter = painterResource(
+                                        when (index) {
+                                            0 -> R.drawable.baseline_home_24
+                                            1 -> R.drawable.outline_menu_book_2_24
+                                            else -> R.drawable.outline_person_24
+                                        }
+                                    ),
+                                    contentDescription = null
+                                )
+                            },
+                            label = {
+                                Text(text = item)
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = selectedColor,
+                                unselectedIconColor = unselectedColor,
+                                selectedTextColor = selectedColor,
+                                unselectedTextColor = unselectedColor,
+                                indicatorColor = selectedColor.copy(alpha = 0.2f)
+                            )
                         )
                     }
+
                 }
+
+
+
+
             }
+
 
         ) { padding ->
 
-            // 🔥 SCREEN CONTENT
+
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize()
+                    .background(color = colorResource(R.color.card_background))
             ) {
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                // ================= 🔴 LOADING =================
+                if (loading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = Color(0xFF2E7D32)
+                        )
+                    }
+                }
+
+
+                // ================= MAIN UI =================
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.TopCenter
                 ) {
 
-                   val id= sessionManager.getUserId()
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Card(
+                            onClick = {
+                                navController.navigate(Screen.Shdule.route)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFE8F5E9)
+                            ),
+                            elevation = CardDefaults.cardElevation(6.dp)
+                        ) {
+
+                            Column(modifier = Modifier.padding(20.dp)) {
+
+                                Text(
+                                    text = "🛒 আজকের বাজার",
+                                    color = Color(0xFF1B5E20),
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                HorizontalDivider(
+                                    color = Color(0xFF2E7D32).copy(alpha = 0.2f),
+                                    thickness = 1.dp
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.outline_person_24),
+                                        contentDescription = null,
+                                        tint = Color(0xFF2E7D32),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Name: ${today?.name ?: "N/A"}",
+                                        color = Color.Black
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.baseline_email_24),
+                                        contentDescription = null,
+                                        tint = Color(0xFF2E7D32),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Email: ${today?.email ?: "N/A"}",
+                                        color = Color.Black)
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.outline_settings_phone_24),
+                                        contentDescription = null,
+                                        tint = Color(0xFF2E7D32),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Number: ${today?.number ?: "N/A"}",
+                                        color = Color.Black)
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = Color(0xFF2E7D32).copy(alpha = 0.1f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "📅 Date: ${today?.start_date ?: ""} → ${today?.end_date ?: ""}",
+                                        color = Color(0xFF2E7D32),
+                                        modifier = Modifier.padding(12.dp)
+                                    )
+                                }
+                            }
 
 
-                    when (selectedIndex) {
-                        0 ->
-                            Text("Home Screen")
+                        }
 
-                        1 -> Text("Profile Screen")
-                        2 ->  navController.navigate(Screen.Users.route)
-                    }
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                        Card(
+                            onClick = {
+                                navController.navigate(Screen.Shdule.route)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            shape = RoundedCornerShape(24.dp), // একটু বেশি রাউন্ডেড করা হয়েছে মডার্ন লুকের জন্য
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFF1F9F3) // আরও সফট এবং চোখের জন্য আরামদায়ক গ্রিন-হোয়াইট ব্যাকগ্রাউন্ড
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // অতিরিক্ত শ্যাডো কমিয়ে ২-৪ dp দেওয়া মডার্ন স্ট্যান্ডার্ড
+                        ) {
+                            Column(modifier = Modifier.padding(20.dp)) {
 
-                    Button(
-                        onClick = {
-                            session.logout()
-                            navController.navigate(Screen.Login.route) {
-                                popUpTo(0) { inclusive = true }
+                                // ================= TITLE & DATE =================
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "🛒 আজকের চলমান মিল",
+                                        color = Color(0xFF113E15), // ডার্ক গ্রিন যা সহজে পড়া যায়
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    )
+
+                                    // ডেটটিকে একটি ছোট মিনিমালিস্ট চিপের মতো লুক দেওয়া হয়েছে
+                                    Surface(
+                                        shape = RoundedCornerShape(50.dp),
+                                        color = Color(0xFFE1F0E3),
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = "${today?.start_date ?: "📅 --"}",
+                                            color = Color(0xFF2E7D32),
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontWeight = FontWeight.Medium
+                                            ),
+                                            modifier = Modifier.padding(
+                                                horizontal = 12.dp,
+                                                vertical = 6.dp
+                                            )
+                                        )
+                                    }
+                                }
+
+//                                Spacer(modifier = Modifier.height(16.dp))
+
+                                HorizontalDivider(
+                                    color = Color(0xFF2E7D32).copy(alpha = 0.1f),
+                                    thickness = 1.2.dp
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // ================= VERTICAL MEAL ITEMS =================
+                                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                                    // 🍛 DOPUR (Lunch)
+                                    Surface(
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(16.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "🍛 দুপুরের মিল",
+                                                color = Color(0xFF388E3C),
+                                                style = MaterialTheme.typography.bodyLarge.copy(
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                            )
+
+                                            Text(
+                                                text = "10 টি",
+                                                color = Color(0xFF1B5E20),
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    // 🌙 RAT (Dinner)
+                                    Surface(
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(16.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "🌙 রাতের মিল",
+                                                color = Color(0xFF388E3C),
+                                                style = MaterialTheme.typography.bodyLarge.copy(
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                            )
+
+                                            Text(
+                                                text = "5 টি",
+                                                color = Color(0xFF1B5E20),
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // ================= TOTAL MEAL BOX =================
+                                // মোট মিল হাইলাইট করার জন্য আলাদা রঙের একটি প্রিমিয়াম কন্টেইনার
+                                Surface(
+                                    color = Color(0xFF2E7D32),
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "📊 মোট মিল সংখ্যা",
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.titleMedium.copy(
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        )
+
+                                        Text(
+                                            text = "15 টি",
+                                            color = Color(0xFFFFF176),
+                                            style = MaterialTheme.typography.headlineSmall.copy(
+                                                fontWeight = FontWeight.ExtraBold
+                                            )
+                                        )
+                                    }
+                                }
                             }
                         }
-                    ) {
-                        Text("Logout")
+
+
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    // 🔴 FAB (Bottom End)
+                    FloatingActionButton(
+                        onClick = {
+                            // TODO: আপনার অ্যাকশন এখানে লিখুন
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(
+                                end = 30.dp
+                            ),
+                        shape = RoundedCornerShape(16.dp),
+                        containerColor = colorResource(R.color.primaryColor),
+                        contentColor = Color.White
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.outline_add_24),
+                            contentDescription = "Add",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
 
-                    Text("I Love You ❤️${sessionManager.getUserId()}")
 
-                    Text("I Love You ❤️${sessionManager.getUserName()}")
                 }
+
+
+
+
+
+
+
+
+
+
+
             }
+
+
+
         }
+
+
     }
 }
+
 @Preview(showSystemUi = true)
 @Composable
 fun loginui() {
     val navController = rememberNavController()
-    val viewModel= LoginViewModel()
-    dashboardScreen(navController,viewModel)
+    val viewModel = ScheduleViewModel()
+    dashboardScreen(navController, viewModel)
 }

@@ -1,15 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Dark version of your color -->
-    <color name="primaryColor">#00838F</color>
+
     <color name="bac">#201A30</color>
 
     <!-- Dark Background -->
-    <color name="background">#121212</color>
+<!--    <color name="background">#FFFFFF</color>-->
 
     <!-- Light Text -->
-    <color name="textColor">#FFFFFF</color>
+    <color name="textColor">#000000</color>
+    <color name="status_bar_green">#06420C</color>
+
+        <!-- ================= BASE ================= -->
+        <color name="black">#FF000000</color>
+        <color name="white">#FFFFFFFF</color>
+
+        <!-- ================= PRIMARY ================= -->
+        <color name="primaryColor">#2E8C94</color>
+        <color name="primary_dark">#00363B</color>
+        <color name="primary_light">#5FB7BF</color>
+
+        <!-- ================= BACKGROUND ================= -->
+        <color name="background">#0F1413</color>
+        <color name="surface">#1B1F1E</color>
+        <color name="card_background">#13281B</color>
+
+        <!-- ================= TEXT ================= -->
+        <color name="text_primary">#FFFFFF</color>
+        <color name="text_secondary">#BDBDBD</color>
+        <color name="text_hint">#888888</color>
+
+        <!-- ================= STATUS COLORS ================= -->
+        <color name="success">#07A40C</color>
+        <color name="warning">#FFB300</color>
+        <color name="error">#EF5350</color>
+        <color name="info">#64B5F6</color>
+
+        <!-- ================= UI COLORS ================= -->
+        <color name="divider">#33FFFFFF</color>
+        <color name="icon_tint">#A5D6A7</color>
+        <color name="fab_color">#2E8C94</color>
+
+        <!-- ================= GREEN VARIANTS ================= -->
+        <color name="green_50">#1B2A1C</color>
+        <color name="green_100">#234A25</color>
+        <color name="green_200">#2E6A33</color>
+        <color name="green_500">#4CAF50</color>
+        <color name="green_700">#66BB6A</color>
+        <color name="green_900">#81C784</color>
 
 
 </resources>

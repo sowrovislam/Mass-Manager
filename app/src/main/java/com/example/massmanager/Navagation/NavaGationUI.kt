@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.Dashboard.BazarShdule
+import com.example.massmanager.Dashboard.DailyMeal
 import com.example.massmanager.ViewModel.LoginViewModel
 import com.example.massmanager.ViewModel.OtpViewModel
 import com.example.massmanager.ViewModel.SignUpViewModel
@@ -18,6 +19,7 @@ import com.example.massmanager.Login_File.ForgateScreen
 import com.example.massmanager.Login_File.LoginScreen
 import com.example.massmanager.Login_File.SignupScreen
 import com.example.massmanager.Login_File.SplashScreen
+import com.example.massmanager.ViewModel.MealViewModel
 import com.example.massmanager.ViewModel.ScheduleViewModel
 
 @Composable
@@ -62,7 +64,7 @@ fun NavigationUI(context: Context) {
 
         composable(Screen.dashboard.route) {
 
-            val viewModel: LoginViewModel = viewModel()
+            val viewModel: ScheduleViewModel= viewModel()
             dashboardScreen(navController,viewModel)
         }
 
@@ -80,6 +82,11 @@ fun NavigationUI(context: Context) {
 
         val viewModel: ScheduleViewModel = viewModel()
         BazarShdule(navController,viewModel)
+    }
+    composable(Screen.Meal.route) {
+
+        val viewModel: MealViewModel = viewModel()
+        DailyMeal(navController,viewModel)
     }
 
 
@@ -99,4 +106,6 @@ fun NavigationUI(context: Context) {
         object Users: Screen("UserScreen")
 
         object Shdule: Screen("BazarShdule")
+
+        object Meal: Screen("DailyMeal")
     }

@@ -25,7 +25,6 @@ class SessionManager(context: Context) {
 
 
 
-
     fun save(admin_Id: Int?, name: String) {
         val editor = pref.edit()
 
@@ -58,8 +57,13 @@ class SessionManager(context: Context) {
 
     // ✅ Get User Name (you missed this)
     fun getUserName(): String? {
+        return pref.getString("username", null)
+    }
+
+    fun Name(): String? {
         return pref.getString("user_name", null)
     }
+
 
     // ✅ Logout
     fun logout() {

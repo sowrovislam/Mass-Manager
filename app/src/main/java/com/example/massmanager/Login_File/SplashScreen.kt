@@ -55,8 +55,8 @@ fun SplashScreen(navController: NavController) {
     // Main splash logic
     LaunchedEffect(isConnected) {
 
-        if (navigated) return@LaunchedEffect
-
+        if (navigated)
+           startAnimation=true
         delay(1200)
 
         if (!isConnected) {

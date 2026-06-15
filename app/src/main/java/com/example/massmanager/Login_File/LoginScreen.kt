@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -102,7 +103,7 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.background))
+            .background(colorResource(R.color.white))
             .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -193,14 +194,32 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
                 value = email,
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Enter Email") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+
+                label = {
+                    Text("Enter Email", color = Color.Black)
+                },
+
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+
                 leadingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.baseline_email_24),
-                        contentDescription = "email icon"
+                        contentDescription = "email icon",
+                        tint = Color.Black
                     )
-                }
+                },
+
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color.Black,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Gray
+                )
             )
 
 
@@ -216,15 +235,34 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
                 value = password,
                 onValueChange = { password = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Enter Password") },
+
+                label = {
+                    Text("Enter Password", color = Color.Black)
+                },
+
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password
+                ),
+
                 leadingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.baseline_password_24),
-                        contentDescription = "email icon"
+                        contentDescription = "password icon",
+                        tint = Color.Black
                     )
-                }
+                },
+
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color.Black,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Gray
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))

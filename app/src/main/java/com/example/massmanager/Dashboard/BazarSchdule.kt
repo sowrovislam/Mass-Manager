@@ -122,6 +122,10 @@ fun BazarShdule(navController: NavController,viewModel: ScheduleViewModel){
                 }}
         }
 
+
+
+
+
         // 📋 FULL LIST
         items(res?.schedule ?: emptyList()) { item ->
 
@@ -152,7 +156,12 @@ fun BazarShdule(navController: NavController,viewModel: ScheduleViewModel){
                     }
                 }
             }
-        }}}
+        }}
+
+
+
+
+        }
     }
 
 

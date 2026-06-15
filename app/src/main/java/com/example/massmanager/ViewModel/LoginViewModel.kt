@@ -52,7 +52,7 @@ class LoginViewModel : ViewModel() {
                         sessionManager.saveLogin(body.data?.id, body.data!!.email)
 
 
-                        sessionManager.save(body.data.id,body.data.email)
+                        sessionManager.save(body.data.id,body.data.name)
 
 
                     } else {

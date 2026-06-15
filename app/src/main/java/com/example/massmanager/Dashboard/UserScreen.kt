@@ -1,33 +1,16 @@
 package com.example.massmanager.Dashboard
 
 import android.widget.Toast
-import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,6 +41,8 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
     val context = LocalContext.current
     val message by viewModel.message.collectAsState()
 
+    val scrollState = rememberScrollState()
+
     LaunchedEffect(message) {
         if (message.isNotEmpty()) {
             userName = ""
@@ -67,192 +52,291 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
+
+    // ✨ ওল্ড ও নিউ সব কমপোজ ভার্সনের জন্য ইউনিভার্সাল এরর-ফ্রি টেক্সটফিল্ড কালারস
+    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = Color.White.copy(alpha = 0.03f),
+        unfocusedContainerColor = Color.Transparent,
+        focusedBorderColor = colorResource(R.color.teal_700),
+        unfocusedBorderColor = Color.White.copy(alpha = 0.15f),
+        focusedLabelColor = colorResource(R.color.teal_700),
+        unfocusedLabelColor = Color.Gray,
+        focusedLeadingIconColor = colorResource(R.color.teal_700),
+        unfocusedLeadingIconColor = Color.Gray,
+        focusedTextColor = Color.White,
+        unfocusedTextColor = Color.White
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.bac)) // Applied dark background
-            .padding(20.dp),
+            .background(colorResource(R.color.bac)) // মেন ডার্ক ব্যাকগ্রাউন্ড
+            .verticalScroll(scrollState)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Top Title
+        // 🌟 Top Interactive Header Icon
+        Box(
+            modifier = Modifier
+                .size(70.dp)
+                .background(colorResource(R.color.teal_700).copy(alpha = 0.15f), shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.outline_person_24),
+                contentDescription = "User Icon",
+                tint = colorResource(R.color.teal_700),
+                modifier = Modifier.size(36.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 📝 Title & Subtitle
         Text(
-            text = "Create User",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.primaryColor) // Updated to white
+            text = "Create New User",
+            fontSize = 26.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color.Black,
+            letterSpacing = 0.5.sp
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "Access to some features requires admin approval.",
+            text = "Fill up the credentials to register a member",
             fontSize = 13.sp,
-            color = colorResource(R.color.primaryColor) // Updated to a cleaner dark-mode friendly red
+            color = Color.Black.copy(alpha = 0.6f)
         )
-        Spacer(modifier = Modifier.height(25.dp))
 
-        Text(
-            text = "নতুন ইউজার নিবন্ধন শুধুমাত্র অ্যাডমিনের মাধ্যমে করা যাবে।" +"অ্যাকাউন্টের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন ধন্যবাদ।",
-            maxLines = 1,
-            modifier = Modifier.basicMarquee(),
-            color = Color.Red,
-            fontSize = 30.sp
-        )
         Spacer(modifier = Modifier.height(20.dp))
 
-        Column(
-            modifier = Modifier.padding(20.dp),
-
-
+        // 🚨 Premium Moving Notice Card
+        Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFFF5252).copy(alpha = 0.08f)
+            ),
+            modifier = Modifier.fillMaxWidth()
         ) {
-
-            // User Name
-            OutlinedTextField(
-                value = userName,
-                onValueChange = { userName = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("User Name", color = colorResource(R.color.textColor)) },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.outline_person_24),
-                        contentDescription = "User",
-                        tint = colorResource(R.color.textColor)
-                    )
-                },
-                shape = RoundedCornerShape(16.dp),
-
-            )
-
-            Spacer(modifier = Modifier.height(16.dp)) // Slightly increased spacing for aesthetic breathing room
-
-            // Email
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Email Address", color = colorResource(R.color.textColor)) },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_email_24),
-                        contentDescription = "Email",
-                        tint = colorResource(R.color.textColor)
-                    )
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                ),
-                shape = RoundedCornerShape(16.dp),
-
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Phone Number
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Phone Number", color = colorResource(R.color.textColor)) },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.outline_settings_phone_24),
-                        contentDescription = "Phone",
-                        tint = colorResource(R.color.textColor)
-                    )
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone
-                ),
-                shape = RoundedCornerShape(16.dp),
-
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Password
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Password", color = colorResource(R.color.textColor)) },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_password_24),
-                        contentDescription = "Password",
-                        tint =colorResource(R.color.textColor)
-                    )
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
-                ),
-                shape = RoundedCornerShape(16.dp),
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            if (loading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = colorResource(R.color.textColor))
-                }
-            }
-
-
-            // Create User Button
-            Button(
-                onClick = {
-                    if (userName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-
-                        Toast.makeText(context, "Fill in the blank fields", Toast.LENGTH_LONG).show()
-
-                    } else {
-
-                        val sessionManager = SessionManager(context)
-
-                        val adminId = sessionManager.adminId()
-                        val currentUserId = sessionManager.getUserId()
-
-                        val isAdmin = adminId == currentUserId
-
-                        // 👉 যদি শুধু admin signup করতে পারে
-                        if (!isAdmin) {
-                            Toast.makeText(context, "Only admin can create account", Toast.LENGTH_LONG).show()
-                            return@Button
-                        }
-
-                        // 🔥 API Call
-                        viewModel.signup(userName, email, phone, password, adminId)
-                        Toast.makeText(context, "${message}", Toast.LENGTH_LONG).show()
-
-                    }
-                },
-                enabled = !loading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(55.dp)
-                    .padding(start = 20.dp, end = 20.dp)
-                ,
-                shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.teal_700),
-                    disabledContainerColor = colorResource(R.color.teal_700).copy(alpha = 0.5f)
-                )
+            Row(
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (loading) "Creating..." else "Create User",
-                    color = colorResource(R.color.textColor),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "⚠️ নতুন ইউজার নিবন্ধন শুধুমাত্র অ্যাডমিনের মাধ্যমে করা যাবে। অ্যাকাউন্টের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন, ধন্যবাদ।",
+                    maxLines = 1,
+                    modifier = Modifier.basicMarquee(),
+                    color = Color(0xFFEF2121),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // 📥 Main Form Glass-Container Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White.copy(alpha = 0.02f) // সেমি ট্রান্সপারেন্ট প্রিমিয়াম লুক
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp)
+            ) {
+
+                // ১. User Name
+                OutlinedTextField(
+                    value = userName,
+                    onValueChange = { userName = it },
+                    modifier = Modifier.fillMaxWidth(),
+
+                    label = {
+                        Text(
+                            "User Name",
+                            color = Color(0xFF2E7D32)
+                        )
+                    },
+
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.outline_person_24),
+                            contentDescription = "User",
+                            tint = Color(0xFF2E7D32)
+                        )
+                    },
+
+                    shape = RoundedCornerShape(14.dp),
+                    singleLine = true,
+
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1B5E20),
+                        unfocusedTextColor = Color(0xFF1B5E20),
+
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+
+                        focusedIndicatorColor = Color(0xFF2E7D32),
+                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
+
+                        cursorColor = Color(0xFF2E7D32)
+                    )
+                )
+
+                // ২. Email
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Email Address") },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_email_24),
+                            contentDescription = "Email"
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1B5E20),
+                        unfocusedTextColor = Color(0xFF1B5E20),
+
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+
+                        focusedIndicatorColor = Color(0xFF2E7D32),
+                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
+
+                        cursorColor = Color(0xFF2E7D32)
+                    ),
+                    singleLine = true
+                )
+
+
+
+                // ৩. Phone Number
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Phone Number") },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.outline_settings_phone_24),
+                            contentDescription = "Phone"
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1B5E20),
+                        unfocusedTextColor = Color(0xFF1B5E20),
+
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+
+                        focusedIndicatorColor = Color(0xFF2E7D32),
+                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
+
+                        cursorColor = Color(0xFF2E7D32)
+                    ),
+                    singleLine = true
+                )
+
+                // ৪. Password
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Password") },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_password_24),
+                            contentDescription = "Password"
+                        )
+                    },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1B5E20),
+                        unfocusedTextColor = Color(0xFF1B5E20),
+
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+
+                        focusedIndicatorColor = Color(0xFF2E7D32),
+                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
+
+                        cursorColor = Color(0xFF2E7D32)
+                    ),
+                    singleLine = true
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // 🚀 Premium Futuristic Button
+        Button(
+            onClick = {
+                if (userName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(context, "Fill in the blank fields", Toast.LENGTH_LONG).show()
+                } else {
+                    val sessionManager = SessionManager(context)
+                    val adminId = sessionManager.adminId()
+                    val currentUserId = sessionManager.getUserId()
+                    val isAdmin = adminId == currentUserId
+
+                    if (!isAdmin) {
+                        Toast.makeText(context, "Only admin can create account", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
+
+                    viewModel.signup(userName, email, phone, password, adminId)
+                }
+            },
+            enabled = !loading,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(R.color.teal_700),
+                disabledContainerColor = colorResource(R.color.teal_700).copy(alpha = 0.4f)
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 4.dp,
+                pressedElevation = 8.dp
+            )
+        ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.5.dp
+                )
+            } else {
+                Text(
+                    text = "Create User",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.5.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
