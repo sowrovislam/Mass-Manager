@@ -88,15 +88,6 @@ interface ApiService {
     suspend fun getMeals(
         @Field("userid") userid: String
     ): MealsResponse
-
-    @FormUrlEncoded
-    @POST("delete_meal.php")
-    suspend fun deleteMeal(
-        @Field("email") email: String,
-        @Field("date") date: String
-    ): DeleteMealResponse
-
-
 }
 
 object RetrofitClient {

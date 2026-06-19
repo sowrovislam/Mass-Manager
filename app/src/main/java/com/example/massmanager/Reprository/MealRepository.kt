@@ -7,7 +7,7 @@ import com.example.massmanager.Api_Otp.Data_Class.RetrofitClient
 
 class MealRepository {
 
-
+    class MealRepository {
 
         suspend fun addMeal(
             userid: String,
@@ -23,7 +23,7 @@ class MealRepository {
                 userid, name, date, counter, isDupur,isRat,email
             )
         }
-
+    }
 
 
 
@@ -37,8 +37,6 @@ class MealRepository {
 
 
 
-    suspend fun deleteMeal(email: String, date: String) =
-        RetrofitClient.api.deleteMeal(email, date)
 
 
 
