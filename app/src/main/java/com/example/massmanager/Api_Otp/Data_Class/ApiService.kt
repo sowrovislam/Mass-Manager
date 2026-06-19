@@ -79,9 +79,22 @@ interface ApiService {
         @Field("date") date: String,
         @Field("counter") counter: String,
         @Field("isDupur") isDupur: String,
-        @Field("isRat") isRat: String
+        @Field("isRat") isRat: String,
+        @Field("email") email: String?
     ): MealResponse
 
+    @FormUrlEncoded
+    @POST("get_meals.php")
+    suspend fun getMeals(
+        @Field("userid") userid: String
+    ): MealsResponse
+
+    @FormUrlEncoded
+    @POST("delete_meal.php")
+    suspend fun deleteMeal(
+        @Field("email") email: String,
+        @Field("date") date: String
+    ): DeleteMealResponse
 
 
 }

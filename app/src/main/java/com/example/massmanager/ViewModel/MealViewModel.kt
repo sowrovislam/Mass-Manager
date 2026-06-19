@@ -7,12 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.massmanager.Reprository.MealRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 import kotlinx.coroutines.launch
 
 class MealViewModel : ViewModel() {
 
-    private val repo = MealRepository.MealRepository()
+    private val repo = MealRepository()
 
     // 🔹 Loading State
     private val _loading = mutableStateOf(false)
@@ -35,6 +37,7 @@ class MealViewModel : ViewModel() {
         counter: String,
         isDupur: String,
         isRat: String,
+        email: String?,
         onResult: (String) -> Unit
     ) {
 
@@ -59,7 +62,8 @@ class MealViewModel : ViewModel() {
                     date,
                     counter,
                     isDupur,
-                    isRat
+                    isRat,
+                    email
                 )
 
                 if (response.success) {
@@ -80,4 +84,63 @@ class MealViewModel : ViewModel() {
             _loading.value = false
         }
     }
+
+
+  // Delete data
+
+    private val repo1 = MealRepository()
+
+    private val _deleteState = MutableStateFlow("")
+    val deleteState: StateFlow<String> = _deleteState
+
+    private val _loadingdelate = MutableStateFlow(false)
+    val loadingDelate: StateFlow<Boolean> = _loadingdelate
+
+    fun deleteMeal(email: String, date: String, onResult: (String) -> Unit) {
+        viewModelScope.launch {
+
+            _loadingdelate.value = true   // ✅ start loading
+
+            try {
+                val res = repo1.deleteMeal(email, date)
+
+                _deleteState.value = res.message
+
+                onResult(res.message)   // ✅ correct
+
+            } catch (e: Exception) {
+
+                val errorMsg = e.message ?: "Error"
+
+                _deleteState.value = errorMsg
+
+                onResult(errorMsg)  // ✅ correct
+            } finally {
+                _loadingdelate.value = false  // ✅ stop loading
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
