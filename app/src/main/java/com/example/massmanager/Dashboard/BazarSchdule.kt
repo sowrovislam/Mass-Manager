@@ -20,9 +20,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,13 +35,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
+import com.example.massmanager.R
 import com.example.massmanager.ViewModel.ScheduleViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BazarShdule(navController: NavController, viewModel: ScheduleViewModel) {
 
@@ -54,9 +61,27 @@ fun BazarShdule(navController: NavController, viewModel: ScheduleViewModel) {
         viewModel.loadSchedule(id)
     }
 
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("বাজার লিস্ট", fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colorResource(R.color.status_bar_green), // SAME as status bar
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
+            )
+        }
+    ) { innerPadding ->
+
+
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .background(MaterialTheme.colorScheme.background)
     ) {
         when {
@@ -65,7 +90,6 @@ fun BazarShdule(navController: NavController, viewModel: ScheduleViewModel) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-
                         .background(Color.Black.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -136,7 +160,7 @@ fun BazarShdule(navController: NavController, viewModel: ScheduleViewModel) {
                     }
                 } else {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(top = 40.dp),
+                        modifier = Modifier.fillMaxSize().padding(top = 4.dp),
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
@@ -144,16 +168,7 @@ fun BazarShdule(navController: NavController, viewModel: ScheduleViewModel) {
                         // 🔥 TODAY'S ACTIVE DUTY BANNER
                         today?.let { data ->
                             item {
-                                Text(
-                                    text = "বাজার লিস্ট",
-                                    style = MaterialTheme.typography.labelLarge.copy(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 0.5.sp
-                                    ),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(start = 4.dp, bottom = 8.dp, top = 8.dp)
-                                )
+
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = CardDefaults.cardColors(
@@ -277,7 +292,7 @@ fun BazarShdule(navController: NavController, viewModel: ScheduleViewModel) {
                 }
             }
         }
-    }
+    }}
 }
 
 // Helper Composable for Clean aligned Text Key-Values

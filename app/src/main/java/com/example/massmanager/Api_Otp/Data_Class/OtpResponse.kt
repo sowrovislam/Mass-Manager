@@ -102,3 +102,9 @@ data class Summary(
     val total_dupur: Int,
     val total_rat: Int
 )
+
+
+data class DeleteMealResponse(
+    val success: Boolean,
+    val message: String
+)
