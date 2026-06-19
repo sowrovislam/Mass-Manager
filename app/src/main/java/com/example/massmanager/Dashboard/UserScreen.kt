@@ -70,7 +70,7 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.bac)) // মেন ডার্ক ব্যাকগ্রাউন্ড
+            .background(colorResource(R.color.background)) // মেন ডার্ক ব্যাকগ্রাউন্ড
             .verticalScroll(scrollState)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -292,17 +292,23 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
                 if (userName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
                     Toast.makeText(context, "Fill in the blank fields", Toast.LENGTH_LONG).show()
                 } else {
+
                     val sessionManager = SessionManager(context)
-                    val adminId = sessionManager.adminId()
-                    val currentUserId = sessionManager.getUserId()
-                    val isAdmin = adminId == currentUserId
+
+                    val role = sessionManager.getRole()
+                    val isAdmin = role == "admin"
+
+//                    val sessionManager = SessionManager(context)
+//                    val adminId = sessionManager.adminId()
+//                    val currentUserId = sessionManager.getUserId()
+//                    val isAdmin = adminId == currentUserId
 
                     if (!isAdmin) {
                         Toast.makeText(context, "Only admin can create account", Toast.LENGTH_LONG).show()
                         return@Button
                     }
 
-                    viewModel.signup(userName, email, phone, password, adminId)
+                    viewModel.signup(userName, email, phone, password, sessionManager.getUserId())
                 }
             },
             enabled = !loading,

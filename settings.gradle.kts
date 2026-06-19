@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Mass Manager"
+rootProject.name = "Mess Manager"
 include(":app")

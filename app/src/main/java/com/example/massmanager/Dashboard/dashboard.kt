@@ -37,6 +37,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) {
     val today by viewModel.todayItem.collectAsState()
+    val summary by viewModel.summary.collectAsState()
+    val meals by viewModel.meals.collectAsState()
+
 
     val context = LocalContext.current
     val session = SessionManager(context)
@@ -49,11 +52,12 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     LaunchedEffect(Unit) {
-        viewModel.load(sessionManager.getUserId()) // শুধু id দিলেই হবে
+
+        viewModel.loadSchedule(sessionManager.getUserId()) // শুধু id দিলেই হবে
 //         viewModel.load(id, "2026-06-10") // optional date
+        viewModel.loadMeals(sessionManager.getUserId().toString())
+
     }
-
-
 
             val view = LocalView.current
 
@@ -67,11 +71,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
         WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = false
     }
 
-
-
-    var selectedIndex by remember { mutableStateOf(0) }
-
-    val items = listOf("Home", "Daily Meal", "User")
+    val items = listOf("হোম", "দৈনিক খাবার", "ইউজার")
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -81,7 +81,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
             ModalDrawerSheet {
 
                 Text(
-                    text = "Mass Manager",
+                    text = "মেস ম্যানেজার",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.titleLarge
                 )
@@ -90,7 +90,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                 Spacer(modifier = Modifier.height(40.dp))
 
                 NavigationDrawerItem(
-                    label = { Text("Dashboard") },
+                    label = { Text("ড্যাশবোর্ড ম্যানেজার") },
                     selected = false,
                     onClick = {
                         scope.launch {
@@ -103,7 +103,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
 
 
                 NavigationDrawerItem(
-                    label = { Text("Bazar Shdule") },
+                    label = { Text("বাজার তালিকা") },
                     selected = false,
 
                     onClick = {
@@ -141,7 +141,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Dashboard") },
+                    title = { Text("ড্যাশবোর্ড") },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = colorResource(R.color.status_bar_green), // SAME as status bar
                         titleContentColor = Color.White,
@@ -269,19 +269,9 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                     .background(color = colorResource(R.color.card_background))
             ) {
 
-                // ================= 🔴 LOADING =================
-                if (loading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = Color(0xFF2E7D32)
-                        )
-                    }
-                }
+
+
+
 
 
                 // ================= MAIN UI =================
@@ -425,7 +415,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                         modifier = Modifier.padding(start = 8.dp)
                                     ) {
                                         Text(
-                                            text = "${today?.start_date ?: "📅 --"}",
+                                            text = "${meals.firstOrNull()?.date ?: "No Date"}",
                                             color = Color(0xFF2E7D32),
                                             style = MaterialTheme.typography.bodySmall.copy(
                                                 fontWeight = FontWeight.Medium
@@ -472,7 +462,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                             )
 
                                             Text(
-                                                text = "10 টি",
+                                                text = "${summary?.total_dupur}টি",
                                                 color = Color(0xFF1B5E20),
                                                 style = MaterialTheme.typography.titleMedium.copy(
                                                     fontWeight = FontWeight.Bold
@@ -503,7 +493,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                             )
 
                                             Text(
-                                                text = "5 টি",
+                                                text = "${summary?.total_rat} টি",
                                                 color = Color(0xFF1B5E20),
                                                 style = MaterialTheme.typography.titleMedium.copy(
                                                     fontWeight = FontWeight.Bold
@@ -538,7 +528,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                         )
 
                                         Text(
-                                            text = "15 টি",
+                                            text = "${summary?.total_counter} টি",
                                             color = Color(0xFFFFF176),
                                             style = MaterialTheme.typography.headlineSmall.copy(
                                                 fontWeight = FontWeight.ExtraBold
@@ -548,6 +538,18 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                 }
                             }
                         }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                     }
@@ -575,6 +577,45 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
 
 
                 }
+
+                if (loading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Card(
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+
+                            Column(
+                                modifier = Modifier
+                                    .padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+
+                                CircularProgressIndicator(
+                                    color = Color(0xFF2E7D32),
+                                    strokeWidth = 3.dp
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                Text(
+                                    text = "Loading...",
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
+                }
+
 
 
 

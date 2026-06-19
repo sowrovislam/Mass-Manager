@@ -2,7 +2,6 @@ package com.example.massmanager.Dashboard
 
 
 import android.app.DatePickerDialog
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 
@@ -43,13 +42,13 @@ import java.util.*
 
 
 @Composable
-fun DailyMeal(navController: NavController,viewModel: MealViewModel) {
+fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
     var selectedDate by remember { mutableStateOf(Date()) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     var isDupurCounter by remember { mutableStateOf(1) }
     var isRatCounter by remember { mutableStateOf(1) }
-    val TotalMealCount=isDupurCounter+isRatCounter
+    val TotalMealCount = isDupurCounter + isRatCounter
     var selected by remember { mutableStateOf<String?>(null) }
     val message = viewModel.message.value
     val isSuccess = viewModel.isSuccess.value
@@ -59,10 +58,6 @@ fun DailyMeal(navController: NavController,viewModel: MealViewModel) {
     var isSelected by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val sessionManager = SessionManager(context)
-
-
-
-
 
 
     val formattedDate = SimpleDateFormat(
@@ -272,16 +267,13 @@ fun DailyMeal(navController: NavController,viewModel: MealViewModel) {
                 .clickable {
 
                     val userId = sessionManager.getUserId()
-                    val name = sessionManager.Name()
+                    val name = sessionManager.getUserName()
 
-                    val name1 = sessionManager.getUserName()
-
-
-
+                    val email = sessionManager.GetEmail()
 
 
                     // ✅ CHECK 2: counter must not be 0
-                    if (isDupurCounter==0 &&isRatCounter == 0) {
+                    if (isDupurCounter == 0 && isRatCounter == 0) {
                         Toast.makeText(context, "Meal count cannot be 0", Toast.LENGTH_SHORT).show()
                         return@clickable
                     }
@@ -289,15 +281,14 @@ fun DailyMeal(navController: NavController,viewModel: MealViewModel) {
 //
 
 
-
-
                     viewModel.addMeal(
                         userid = userId.toString(),
                         name = name ?: "Daily Meal",
                         date = formattedDate,
                         counter = TotalMealCount.toString(),
-                        isDupur =isDupurCounter.toString(),
-                        isRat =isRatCounter.toString(),
+                        isDupur = isDupurCounter.toString(),
+                        isRat = isRatCounter.toString(),
+                        email =email,
 
                         onResult = { message ->
                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -347,7 +338,7 @@ fun DailyMeal(navController: NavController,viewModel: MealViewModel) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text =  "✓",
+                        text = "✓",
                         color = Color.White,
                         fontSize = 18.sp
                     )
@@ -453,6 +444,6 @@ fun DailyMeal(navController: NavController,viewModel: MealViewModel) {
 @Composable
 fun login() {
     val navController = rememberNavController()
-    val viewModel =MealViewModel()
-    DailyMeal(navController,viewModel)
+    val viewModel = MealViewModel()
+    DailyMeal(navController, viewModel)
 }

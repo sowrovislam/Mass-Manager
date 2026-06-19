@@ -76,3 +76,29 @@ data class MealResponse(
     val success: Boolean,
     val message: String
 )
+
+
+
+data class MealsResponse(
+    val success: Boolean,
+    val today: String,
+    val meals_list: List<MealItem>,
+    val summary: Summary
+)
+
+data class MealItem(
+    val id: Int,
+    val userid: String,
+    val name: String,
+    val email: String,
+    val date: String,
+    val counter: Int,
+    val isDupur: Int,
+    val isRat: Int
+)
+
+data class Summary(
+    val total_counter: Int,
+    val total_dupur: Int,
+    val total_rat: Int
+)

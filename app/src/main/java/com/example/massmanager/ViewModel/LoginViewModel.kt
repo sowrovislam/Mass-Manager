@@ -49,11 +49,23 @@ class LoginViewModel : ViewModel() {
                         _user.value = body.data
 
                         val sessionManager = SessionManager(context)
-                        sessionManager.saveLogin(body.data?.id, body.data!!.email)
+
+                        // ✅ SAVE AS ADMIN
+                        sessionManager.saveLogin(
+                            body.data?.id,
+                            body.data!!.email,
+                            body.data!!.name,
+                            "admin"
+
+                        )
 
 
-                        sessionManager.save(body.data.id,body.data.name)
-
+//                        val sessionManager = SessionManager(context)
+//                        sessionManager.saveLogin(body.data?.id, body.data!!.name)
+//
+//
+//                        sessionManager.save(body.data.id,body.data.name)
+//
 
                     } else {
                         _success.value = false
@@ -93,9 +105,21 @@ class LoginViewModel : ViewModel() {
                 if (response.status == "success") {
                     loginState.value = response
 
-                    val sessionManager = SessionManager(context)
-                    sessionManager.saveLogin(response.user_id, response.name)
 
+                    val sessionManager = SessionManager(context)
+
+                    // ✅ SAVE AS USER
+                    sessionManager.saveLogin(
+                        response.user_id,
+                        response.email,
+                        response.name,
+                        "user"
+
+                    )
+
+
+//                    val sessionManager = SessionManager(context)
+//                    sessionManager.saveLogin(response.user_id, response.name)
 
                 } else {
                     errorMessage.value = response.message

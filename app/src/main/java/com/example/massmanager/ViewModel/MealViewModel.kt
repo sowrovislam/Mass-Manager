@@ -35,6 +35,7 @@ class MealViewModel : ViewModel() {
         counter: String,
         isDupur: String,
         isRat: String,
+        email: String?,
         onResult: (String) -> Unit
     ) {
 
@@ -59,7 +60,8 @@ class MealViewModel : ViewModel() {
                     date,
                     counter,
                     isDupur,
-                    isRat
+                    isRat,
+                    email
                 )
 
                 if (response.success) {
