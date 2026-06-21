@@ -1,6 +1,9 @@
 package com.example.massmanager.Dashboard
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.*
@@ -28,21 +31,47 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.ViewModel.SignUpViewModel
+import com.example.massmanager.ViewModel.OtpViewModel // 🔥 ওটিপির জন্য ভিউমডেল ইমপোর্ট
 import com.example.massmanager.R
 
 @Composable
-fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
+fun UserScreen(
+    navController: NavController,
+    viewModel: SignUpViewModel,
+    otpViewModel: OtpViewModel // 🔥 ওটিপি ভিউমডেল প্যারামিটার অ্যাড করা হয়েছে
+) {
 
+    // Form Field States
     var userName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    // Viewmodel States
     val loading by viewModel.loading.collectAsState()
-    val context = LocalContext.current
     val message by viewModel.message.collectAsState()
+    val context = LocalContext.current
+
+    // 🔥 ওটিপি ভিউমডেল স্টেটস
+    val otpLoading by otpViewModel.loading.collectAsState()
+    val otpMessage by otpViewModel.message.collectAsState()
+    val otpStatus by otpViewModel.status.collectAsState()
+    val otpCode by otpViewModel.otpState.collectAsState()
 
     val scrollState = rememberScrollState()
 
+    // এরর হ্যান্ডলিং এবং ওটিপি কন্ট্রোল স্টেট
+    var nameError by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+    var otpError by remember { mutableStateOf(false) }
+    var isOtpSent by remember { mutableStateOf(false) }
+
+    val isOtpSuccess = otpStatus == "OTP Verified Success"
+    val isOtpInvalid = otpStatus == "Invalid OTP"
+
+    // সাইনআপ মেসেজ লিসেনার
     LaunchedEffect(message) {
         if (message.isNotEmpty()) {
             userName = ""
@@ -53,255 +82,311 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
         }
     }
 
-    // ✨ ওল্ড ও নিউ সব কমপোজ ভার্সনের জন্য ইউনিভার্সাল এরর-ফ্রি টেক্সটফিল্ড কালারস
-    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedContainerColor = Color.White.copy(alpha = 0.03f),
-        unfocusedContainerColor = Color.Transparent,
-        focusedBorderColor = colorResource(R.color.teal_700),
-        unfocusedBorderColor = Color.White.copy(alpha = 0.15f),
-        focusedLabelColor = colorResource(R.color.teal_700),
-        unfocusedLabelColor = Color.Gray,
-        focusedLeadingIconColor = colorResource(R.color.teal_700),
-        unfocusedLeadingIconColor = Color.Gray,
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White
-    )
+    // ওটিপি মেসেজ টোস্ট লিসেনার
+    LaunchedEffect(otpMessage) {
+        if (!otpMessage.isNullOrEmpty()) {
+            Toast.makeText(context, otpMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.background)) // মেন ডার্ক ব্যাকগ্রাউন্ড
-            .verticalScroll(scrollState)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .background(colorResource(R.color.white))
+            .imePadding()
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // 🌟 Top Interactive Header Icon
-        Box(
+        Column(
             modifier = Modifier
-                .size(70.dp)
-                .background(colorResource(R.color.teal_700).copy(alpha = 0.15f), shape = CircleShape),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.outline_person_24),
-                contentDescription = "User Icon",
-                tint = colorResource(R.color.teal_700),
-                modifier = Modifier.size(36.dp)
-            )
-        }
+            Spacer(modifier = Modifier.height(9.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 📝 Title & Subtitle
-        Text(
-            text = "Create New User",
-            fontSize = 26.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.Black,
-            letterSpacing = 0.5.sp
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = "Fill up the credentials to register a member",
-            fontSize = 13.sp,
-            color = Color.Black.copy(alpha = 0.6f)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // 🚨 Premium Moving Notice Card
-        Card(
-            shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFFF5252).copy(alpha = 0.08f)
-            ),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "⚠️ নতুন ইউজার নিবন্ধন শুধুমাত্র অ্যাডমিনের মাধ্যমে করা যাবে। অ্যাকাউন্টের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন, ধন্যবাদ।",
-                    maxLines = 1,
-                    modifier = Modifier.basicMarquee(),
-                    color = Color(0xFFEF2121),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // 📥 Main Form Glass-Container Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.02f) // সেমি ট্রান্সপারেন্ট প্রিমিয়াম লুক
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(
+            // 🌟 Top Interactive Header Icon
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(18.dp)
+                    .size(70.dp)
+                    .background(colorResource(R.color.primaryColor).copy(alpha = 0.1f), shape = CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-
-                // ১. User Name
-                OutlinedTextField(
-                    value = userName,
-                    onValueChange = { userName = it },
-                    modifier = Modifier.fillMaxWidth(),
-
-                    label = {
-                        Text(
-                            "User Name",
-                            color = Color(0xFF2E7D32)
-                        )
-                    },
-
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.outline_person_24),
-                            contentDescription = "User",
-                            tint = Color(0xFF2E7D32)
-                        )
-                    },
-
-                    shape = RoundedCornerShape(14.dp),
-                    singleLine = true,
-
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color(0xFF1B5E20),
-                        unfocusedTextColor = Color(0xFF1B5E20),
-
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-
-                        focusedIndicatorColor = Color(0xFF2E7D32),
-                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
-
-                        cursorColor = Color(0xFF2E7D32)
-                    )
-                )
-
-                // ২. Email
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Email Address") },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_email_24),
-                            contentDescription = "Email"
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color(0xFF1B5E20),
-                        unfocusedTextColor = Color(0xFF1B5E20),
-
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-
-                        focusedIndicatorColor = Color(0xFF2E7D32),
-                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
-
-                        cursorColor = Color(0xFF2E7D32)
-                    ),
-                    singleLine = true
-                )
-
-
-
-                // ৩. Phone Number
-                OutlinedTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Phone Number") },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.outline_settings_phone_24),
-                            contentDescription = "Phone"
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color(0xFF1B5E20),
-                        unfocusedTextColor = Color(0xFF1B5E20),
-
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-
-                        focusedIndicatorColor = Color(0xFF2E7D32),
-                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
-
-                        cursorColor = Color(0xFF2E7D32)
-                    ),
-                    singleLine = true
-                )
-
-                // ৪. Password
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Password") },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_password_24),
-                            contentDescription = "Password"
-                        )
-                    },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color(0xFF1B5E20),
-                        unfocusedTextColor = Color(0xFF1B5E20),
-
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-
-                        focusedIndicatorColor = Color(0xFF2E7D32),
-                        unfocusedIndicatorColor = Color(0xFFBDBDBD),
-
-                        cursorColor = Color(0xFF2E7D32)
-                    ),
-                    singleLine = true
+                Icon(
+                    painter = painterResource(id = R.drawable.outline_person_24),
+                    contentDescription = "User Icon",
+                    tint = colorResource(R.color.primaryColor),
+                    modifier = Modifier.size(36.dp)
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // 🚀 Premium Futuristic Button
-        Button(
-            onClick = {
-                if (userName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(context, "Fill in the blank fields", Toast.LENGTH_LONG).show()
-                } else {
+            // 📝 Title & Subtitle
+            Text(
+                text = "Create New User",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.fillMaxWidth(),
+                color = colorResource(R.color.textColor)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Fill up the credentials and verify email to register a member.",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                modifier = Modifier.fillMaxWidth(),
+                lineHeight = 20.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 🚨 Premium Moving Notice Card
+            Card(
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFF5252).copy(alpha = 0.08f)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "⚠️ নোটিশ: ",
+                        color = Color(0xFFEF2121),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "নতুন ইউজার নিবন্ধন শুধুমাত্র অ্যাডমিনের মাধ্যমে করা যাবে। অ্যাকাউন্টের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন, ধন্যবাদ।",
+                        modifier = Modifier.basicMarquee(),
+                        color = Color(0xFFEF2121),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 📥 Main Form Section
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = colorResource(R.color.white)
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+
+                    // --- ১. EMAIL FIELD WITH INTEGRATED OTP BUTTON ---
+                    DashboardInputLabel(text = "Email Address*")
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it; emailError = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("name@example.com", color = Color.DarkGray) },
+                        isError = emailError,
+                        readOnly = isOtpSent, // ওটিপি পাঠালে ফিল্ড লক হবে
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_email_24),
+                                contentDescription = "Email",
+                                tint = colorResource(R.color.primaryColor)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        colors = getDashboardTextFieldColors(),
+                        trailingIcon = {
+                            if (!isOtpSent) {
+                                Button(
+                                    onClick = {
+                                        emailError = email.isBlank()
+                                        if (!emailError) {
+                                            otpViewModel.sendOtp(email)
+                                            isOtpSent = true
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = colorResource(R.color.primaryColor)
+                                    ),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                    modifier = Modifier.padding(end = 6.dp)
+                                ) {
+                                    Text("Get OTP", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
+                            } else {
+                                Icon(
+                                    painter = painterResource(R.drawable.outline_check_small_24),
+                                    contentDescription = "Sent",
+                                    tint = Color(0xFF2E7D32),
+                                    modifier = Modifier.padding(end = 12.dp)
+                                )
+                            }
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    // --- ২. VERIFICATION CODE ROW ---
+                    DashboardInputLabel(text = "Verification Code*")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = otpCode,
+                            onValueChange = { otpViewModel.setOtp(it); otpError = false },
+                            placeholder = { Text("000000", color = Color.DarkGray) },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            isError = otpError,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_password_24),
+                                    contentDescription = "OTP",
+                                    tint = colorResource(R.color.primaryColor)
+                                )
+                            },
+                            colors = getDashboardTextFieldColors(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        Button(
+                            onClick = {
+                                emailError = email.isBlank()
+                                otpError = otpCode.isBlank()
+                                if (!emailError && !otpError) {
+                                    otpViewModel.verifyOtp(email, otpCode)
+                                }
+                            },
+                            enabled = !isOtpSuccess,
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.width(125.dp).height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = when {
+                                    isOtpSuccess -> Color(0xFF2E7D32)
+                                    isOtpInvalid -> Color(0xFFD32F2F)
+                                    else -> colorResource(R.color.primaryColor)
+                                },
+                                disabledContainerColor = Color(0xFF2E7D32)
+                            )
+                        ) {
+                            Text(
+                                text = when {
+                                    isOtpSuccess -> "Verified ✓"
+                                    isOtpInvalid -> "Retry ✕"
+                                    else -> "Verify"
+                                },
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    // --- ৩. User Name ---
+                    DashboardInputLabel(text = "User Name*")
+                    OutlinedTextField(
+                        value = userName,
+                        onValueChange = { userName = it; nameError = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Enter full name", color = Color.DarkGray) },
+                        isError = nameError,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.outline_person_24),
+                                contentDescription = "User",
+                                tint = colorResource(R.color.primaryColor)
+                            )
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        colors = getDashboardTextFieldColors()
+                    )
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    // --- ৪. Phone Number ---
+                    DashboardInputLabel(text = "Phone Number*")
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = { phone = it; phoneError = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Enter phone number", color = Color.DarkGray) },
+                        isError = phoneError,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.outline_settings_phone_24),
+                                contentDescription = "Phone",
+                                tint = colorResource(R.color.primaryColor)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        colors = getDashboardTextFieldColors()
+                    )
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    // --- ৫. Password ---
+                    DashboardInputLabel(text = "Password*")
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it; passwordError = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("••••••••", color = Color.DarkGray) },
+                        isError = passwordError,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_password_24),
+                                contentDescription = "Password",
+                                tint = colorResource(R.color.primaryColor)
+                            )
+                        },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        colors = getDashboardTextFieldColors()
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 🚀 Submit Button
+            Button(
+                onClick = {
+                    nameError = userName.isBlank()
+                    emailError = email.isBlank()
+                    phoneError = phone.isBlank()
+                    passwordError = password.isBlank()
+
+                    if (nameError || emailError || phoneError || passwordError) {
+                        Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    // ওটিপি ভেরিফাইড না হলে অ্যাকাউন্ট তৈরি করতে দেবে না
+                    if (!isOtpSuccess) {
+                        Toast.makeText(context, "Please verify OTP first", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
 
                     val sessionManager = SessionManager(context)
-
                     val role = sessionManager.getRole()
                     val isAdmin = role == "admin"
-
-//                    val sessionManager = SessionManager(context)
-//                    val adminId = sessionManager.adminId()
-//                    val currentUserId = sessionManager.getUserId()
-//                    val isAdmin = adminId == currentUserId
 
                     if (!isAdmin) {
                         Toast.makeText(context, "Only admin can create account", Toast.LENGTH_LONG).show()
@@ -309,45 +394,83 @@ fun UserScreen(navController: NavController, viewModel: SignUpViewModel) {
                     }
 
                     viewModel.signup(userName, email, phone, password, sessionManager.getUserId())
-                }
-            },
-            enabled = !loading,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(R.color.teal_700),
-                disabledContainerColor = colorResource(R.color.teal_700).copy(alpha = 0.4f)
-            ),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 4.dp,
-                pressedElevation = 8.dp
-            )
-        ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    color = Color.White,
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.5.dp
+                },
+                enabled = !(loading || otpLoading),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.primaryColor),
+                    disabledContainerColor = Color.LightGray
                 )
-            } else {
+            ) {
                 Text(
                     text = "Create User",
                     color = Color.White,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
+                    fontWeight = FontWeight.Bold
                 )
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        // মডার্ন ফুলস্ক্রিন ব্লকিং লোডিং ওভারলে (Signup বা OTP লোডিং চললে চালু হবে)
+        AnimatedVisibility(
+            visible = loading || otpLoading,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color.White,
+                    modifier = Modifier.size(80.dp),
+                    shadowElevation = 4.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = colorResource(R.color.primaryColor))
+                    }
+                }
+            }
+        }
     }
 }
 
+// ইনপুট লেবেলের জন্য রিইউজেবল কম্পোনেন্ট
+@Composable
+fun DashboardInputLabel(text: String) {
+    Text(
+        text = text,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Medium,
+        color = colorResource(R.color.textColor),
+        modifier = Modifier.padding(bottom = 6.dp, start = 2.dp)
+    )
+}
+
+// মডার্ন লাইট থিম টেক্সট ফিল্ড কালার স্কিম
+@Composable
+fun getDashboardTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = Color.Black,
+    unfocusedTextColor = Color.Black,
+    cursorColor = colorResource(R.color.primaryColor),
+    focusedContainerColor = Color(0xFFF9F9FA),
+    unfocusedContainerColor = Color(0xFFF9F9FA),
+    errorContainerColor = Color(0xFFFFF5F5),
+    focusedBorderColor = colorResource(R.color.primaryColor),
+    unfocusedBorderColor = Color(0xFFE2E8F0),
+    errorBorderColor = Color.Red
+)
+
 @Preview(showSystemUi = true)
 @Composable
-fun Previofile() {
-    UserScreen(rememberNavController(), viewModel())
+fun PreviewUserScreen() {
+    UserScreen(rememberNavController(), viewModel(), viewModel())
 }

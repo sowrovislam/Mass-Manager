@@ -61,7 +61,7 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("চলমান মিলের তালিকা", fontWeight = FontWeight.Bold) },
+                title = { Text("প্রতিদিনের মিল", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colorResource(R.color.status_bar_green), // SAME as status bar
                     titleContentColor = Color.White,

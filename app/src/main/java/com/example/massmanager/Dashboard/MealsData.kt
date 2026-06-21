@@ -43,7 +43,7 @@ fun MealsData(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Meal List", fontWeight = FontWeight.Bold) },
+                title = { Text("চলমান মিল", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colorResource(R.color.status_bar_green), // SAME as status bar
                     titleContentColor = Color.White,

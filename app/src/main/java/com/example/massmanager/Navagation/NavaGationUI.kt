@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.Dashboard.BazarShdule
 import com.example.massmanager.Dashboard.DailyMeal
+import com.example.massmanager.Dashboard.GroceryListScreen
 
 import com.example.massmanager.ViewModel.LoginViewModel
 import com.example.massmanager.ViewModel.OtpViewModel
@@ -20,8 +21,10 @@ import com.example.massmanager.Login_File.ForgateScreen
 import com.example.massmanager.Login_File.LoginScreen
 import com.example.massmanager.Login_File.SignupScreen
 import com.example.massmanager.Login_File.SplashScreen
+import com.example.massmanager.ViewModel.GroceryViewModel
 import com.example.massmanager.ViewModel.MealViewModel
 import com.example.massmanager.ViewModel.ScheduleViewModel
+import com.example.massmanager.ViewModel.UserViewModel
 import com.example.massmanager.ui.components.MealsData
 
 @Composable
@@ -71,14 +74,17 @@ fun NavigationUI(context: Context) {
         }
 
         composable(Screen.Profile.route) {
-            ProfileScreen(navController)
+            val viewModel: UserViewModel= viewModel()
+            ProfileScreen(navController,viewModel)
         }
 
 
     composable(Screen.Users.route) {
 
         val viewModel: SignUpViewModel = viewModel()
-        UserScreen(navController,viewModel)
+
+        val otpViewModel: OtpViewModel = viewModel()
+        UserScreen(navController,viewModel,otpViewModel)
     }
     composable(Screen.Shdule.route) {
 
@@ -94,6 +100,11 @@ fun NavigationUI(context: Context) {
 
         val viewModel: ScheduleViewModel = viewModel()
             MealsData(navController,viewModel)
+    }
+        composable(Screen.GroceryListScreen.route) {
+
+        val viewModel: GroceryViewModel = viewModel()
+            GroceryListScreen(navController,viewModel)
     }
 
 
@@ -117,4 +128,6 @@ fun NavigationUI(context: Context) {
         object Meal: Screen("DailyMeal")
 
         object MealsData: Screen("MealsData")
+
+        object GroceryListScreen: Screen("GroceryListScreen")
     }

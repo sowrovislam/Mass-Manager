@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -75,68 +76,86 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-
-        // 🔥 DRAWER MENU
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                // ✅ fillMaxWidth() এর বদলে স্ট্যান্ডার্ড উইডথ এবং প্যাডিং ব্যবহার করা হয়েছে
+                modifier = Modifier
+                    .width(320.dp)
+                    .fillMaxHeight(),
+                drawerContainerColor = colorResource(R.color.teal_700),
+                drawerShape = androidx.compose.foundation.shape.RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+            ) {
 
+                // ================= DRAWER HEADER =================
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = "মেস ম্যানেজার",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.titleLarge
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.sp
+                    ),
+                    color = Color.White
                 )
 
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(40.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = Color.White.copy(alpha = 0.2f) // হালকা ও মার্জিত ডিভাইডার
+                )
 
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // ================= DRAWER ITEMS =================
+
+                // ১. ড্যাশবোর্ড ম্যানেজার
                 NavigationDrawerItem(
                     label = { Text("ড্যাশবোর্ড ম্যানেজার") },
                     selected = false,
                     onClick = {
-                        scope.launch {
-                            drawerState.close()   // 👈 Close drawer
-                        }
+                        scope.launch { drawerState.close() }
                     },
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedContainerColor = Color.Transparent,
+                        unselectedTextColor = Color.White,
+                        unselectedIconColor = Color.White.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                 )
 
+                // ২. প্রোফাইল
+                NavigationDrawerItem(
+                    label = { Text("প্রোফাইল") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate(Screen.Profile.route)
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedContainerColor = Color.Transparent,
+                        unselectedTextColor = Color.White, // ✅ টেক্সট ও আইকন কালার এক রাখা হয়েছে স্ট্যান্ডার্ডের জন্য
+                        unselectedIconColor = Color.White.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
 
-
+                // ৩. বাজার তালিকা
                 NavigationDrawerItem(
                     label = { Text("বাজার তালিকা") },
                     selected = false,
-
                     onClick = {
-                        scope.launch {
-                            drawerState.close()   // 👈 Close drawer
-                        }
-                        navController.navigate(Screen.Shdule.route) {
-
-                        }
+                        scope.launch { drawerState.close() }
+                        navController.navigate(Screen.Shdule.route)
                     },
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedContainerColor = Color.Transparent,
+                        unselectedTextColor = Color.White,
+                        unselectedIconColor = Color.White.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                 )
-
-
-                NavigationDrawerItem(
-                    label = { Text("Logout") },
-                    selected = false,
-                    onClick = {
-                        scope.launch {
-                            drawerState.close()   // 👈 Close drawer
-                        }
-                        session.logout()
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    },
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-                )
-
-
             }
         }
-    ) {
+    ){
 
         Scaffold(
             topBar = {
@@ -557,7 +576,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                     // 🔴 FAB (Bottom End)
                     FloatingActionButton(
                         onClick = {
-                            // TODO: আপনার অ্যাকশন এখানে লিখুন
+                          navController.navigate(Screen.GroceryListScreen.route)
                         },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)

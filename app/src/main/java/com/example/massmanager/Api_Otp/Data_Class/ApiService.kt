@@ -3,6 +3,7 @@ package com.example.massmanager.Api_Otp.Data_Class
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -96,6 +97,25 @@ interface ApiService {
         @Field("email") email: String,
         @Field("date") date: String
     ): DeleteMealResponse
+
+    @FormUrlEncoded
+    @POST("get_user_all_data.php")
+    suspend fun getUsers(
+        @Field("usersid") usersid: String
+    ): UserResponse
+
+    @FormUrlEncoded
+    @POST("delete_user.php")
+    suspend fun deleteUser(
+        @Field("email") email: String
+    ): DeleteResponse
+
+
+    @POST("save_grocery.php")
+    suspend fun saveBulk(
+        @Body request: GroceryRequest
+    ): BasicResponse
+
 
 
 }
