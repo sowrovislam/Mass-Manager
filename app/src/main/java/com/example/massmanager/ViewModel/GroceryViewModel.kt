@@ -42,22 +42,21 @@ class GroceryViewModel : ViewModel() {
                 it.price.toDoubleOrNull() ?: 0.0
             }
 
-            // ২. রিডেবল ডেট ফরম্যাট তৈরি করা
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            // 🛠️ ২. আপনার চাওয়া ফরম্যাট অনুযায়ী রিডেবল ডেট তৈরি করা (যেমন: 23 June, 2026)
+            val sdf = SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault())
             val currentDate = sdf.format(Date())
 
-            // ৩. রিকোয়েস্ট অবজেক্ট তৈরি
+            // ৩. রিকোয়েস্ট অবজেক্ট তৈরি
             val request = GroceryRequest(
                 name = name,
                 email = email,
                 userid = userid,
-                total = totalAmount.toString(),
-                date = currentDate,
+                date = currentDate, // এখানে এখন "23 June, 2026" বা "30 June, 2026" পাস হবে
                 items = list
             )
 
             try {
-                // ৪. নেটওয়ার্ক কল
+                // ৪. নেটওয়ার্ক কল
                 val res = repo.saveBulk(request)
                 message.value = res.message
             } catch (e: Exception) {

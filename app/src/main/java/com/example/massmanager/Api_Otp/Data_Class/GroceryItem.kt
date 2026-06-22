@@ -14,7 +14,6 @@ data class GroceryRequest(
     val name: String,
     val email: String,
     val userid: String,
-    val total: String,
     val date: String,
     val items: List<GroceryItem>
 )

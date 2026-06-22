@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -31,7 +34,7 @@ fun ProfileScreen(
     userViewModel: UserViewModel = viewModel() // ✅ Standard Way to inject ViewModel
 ) {
     val context = LocalContext.current
-
+    var showDeleteDialog by remember { mutableStateOf(false) }
     // ১. একটি মাত্র SessionManager অবজেক্ট তৈরি এবং রিমেম্বার করা হলো
     val sessionManager = remember { SessionManager(context) }
 
@@ -83,24 +86,127 @@ fun ProfileScreen(
 
             // ================= PROFILE CARD =================
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                   , // হালকা মার্জিন দিয়ে ফ্রেম সুন্দর করা হয়েছে
+                shape = RoundedCornerShape(24.dp), // মডার্ন কার্ভড কর্নার
                 colors = CardDefaults.cardColors(
                     containerColor = colorResource(R.color.primaryColor)
-                )
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp) // হালকা ইলিভেশন
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = if (isAdmin) "Admin Control Panel" else "User Dashboard",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                Column(modifier = Modifier.padding(24.dp)) { // প্যাডিং একটু বাড়িয়ে ১২ থেকে ২৪ করা হয়েছে
 
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = "Name    :  $currentUserName", color = Color.White)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Email   :  $currentUserEmail", color = Color.White)
+                    // ================= HEADER SECTION =================
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = if (isAdmin) "Admin Control Panel" else "User Dashboard",
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White,
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    letterSpacing = 0.5.sp
+                                )
+                            )
+                            Text(
+                                text = "Welcome back!",
+                                color = Color.White.copy(alpha = 0.6f),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        // একটি স্টাইলিশ রোল ব্যাজ (Admin/User)
+                        Surface(
+                            color = Color.White.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(50.dp)
+                        ) {
+                            Text(
+                                text = if (isAdmin) "👑 Admin" else "👤 Member",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                    HorizontalDivider(color = Color.White.copy(alpha = 0.15f), thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // ================= INFO BLOCK =================
+                    // নাম এবং ইমেইলের "Name : " এই ম্যানুয়াল স্পেসিং বাদ দিয়ে Row এবং আইকন দিয়ে সাজানো হয়েছে
+
+                    // ১. নাম row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(Color.White.copy(alpha = 0.1f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.outline_person_24), // আপনার প্রজেক্টের আইকন দিন
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "NAME",
+                                color = Color.White.copy(alpha = 0.5f),
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Text(
+                                text = currentUserName,
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // ২. ইমেইল row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(Color.White.copy(alpha = 0.1f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_email_24), // আপনার প্রজেক্টের আইকন দিন
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "EMAIL ADDRESS",
+                                color = Color.White.copy(alpha = 0.5f),
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Text(
+                                text = currentUserEmail,
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
+                            )
+                        }
+                    }
                 }
             }
 
@@ -146,6 +252,10 @@ fun ProfileScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
+                                        
+
+
+
                                         Button(
                                             onClick = {
                                                 userViewModel.deleteUser(user.email, currentUserId)
@@ -156,7 +266,76 @@ fun ProfileScreen(
                                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
                                             shape = RoundedCornerShape(8.dp)
                                         ) {
+                                            Text("Update", color = Color.White)
+                                        }
+// ২. আপনার ডিলিট বাটন
+                                        Button(
+                                            onClick = {
+                                                showDeleteDialog = true // বাটনে ক্লিক করলে ডায়ালগ চালু হবে
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                                            shape = RoundedCornerShape(8.dp)
+                                        ) {
                                             Text("Delete", color = Color.White)
+                                        }
+
+// ৩. 🔴 কনফার্মেশন অ্যালার্ট ডায়ালগ লজিক
+                                        if (showDeleteDialog) {
+                                            AlertDialog(
+                                                onDismissRequest = {
+                                                    showDeleteDialog =
+                                                        false // ডায়ালগের বাইরে ক্লিক করলে বন্ধ হবে
+                                                },
+                                                title = {
+                                                    Text(
+                                                        text = "ইউজার ডিলিট করুন",
+                                                        fontWeight = FontWeight.Bold,
+                                                        style = MaterialTheme.typography.titleMedium
+                                                    )
+                                                },
+                                                text = {
+                                                    Text(
+                                                        text = "আপনি কি নিশ্চিতভাবে এই ইউজারটি ডিলিট করতে চান? এই কাজটি আর ফিরিয়ে আনা যাবে না।",
+                                                        style = MaterialTheme.typography.bodyMedium
+                                                    )
+                                                },
+                                                confirmButton = {
+                                                    Button(
+                                                        onClick = {
+                                                            showDeleteDialog =
+                                                                false // ডায়ালগ বন্ধ করুন
+
+                                                            // 🎯 আসল ডিলিট অ্যাকশন এখানে কাজ করবে
+                                                            userViewModel.deleteUser(
+                                                                user.email,
+                                                                currentUserId
+                                                            )
+                                                        },
+                                                        colors = ButtonDefaults.buttonColors(
+                                                            containerColor = Color(0xFFE53935)
+                                                        ) // ডিলিট বাটন লাল কালার
+                                                    ) {
+                                                        Text(
+                                                            "হ্যাঁ, ডিলিট করুন",
+                                                            color = Color.White
+                                                        )
+                                                    }
+                                                },
+                                                dismissButton = {
+                                                    TextButton(
+                                                        onClick = {
+                                                            showDeleteDialog =
+                                                                false // ক্যানসেল করলে ডায়ালগ বন্ধ হবে
+                                                        }
+                                                    ) {
+                                                        Text("না, ক্যানসেল", color = Color.Gray)
+                                                    }
+                                                },
+                                                shape = RoundedCornerShape(16.dp) // ডায়ালগের কর্নার সুন্দর করার জন্য
+                                            )
+
+
                                         }
                                     }
                                 }

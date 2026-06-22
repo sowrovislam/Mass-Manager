@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 class LoginViewModel : ViewModel() {
 
 
-
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
@@ -29,7 +28,7 @@ class LoginViewModel : ViewModel() {
     private val _user = MutableStateFlow<UserData?>(null)
     val user: StateFlow<UserData?> = _user
 
-    fun admin_login(email: String, password: String,context: Context) {
+    fun admin_login(email: String, password: String, context: Context, onResult: (String) -> Unit) {
 
         viewModelScope.launch {
             _loading.value = true
@@ -47,7 +46,7 @@ class LoginViewModel : ViewModel() {
                     if (body.status == "success") {
                         _success.value = true
                         _user.value = body.data
-
+                        onResult(body.message)
                         val sessionManager = SessionManager(context)
 
                         // ✅ SAVE AS ADMIN
@@ -69,6 +68,7 @@ class LoginViewModel : ViewModel() {
 
                     } else {
                         _success.value = false
+                        onResult(body.message)
                     }
 
                 } else {
@@ -86,16 +86,13 @@ class LoginViewModel : ViewModel() {
     }
 
 
-
-
-
     private val repository = AuthRepository()
 
     var loginState = mutableStateOf<UsersLogin?>(null)
     var errorMessage = mutableStateOf("")
     var isLoading = mutableStateOf(false)
 
-    fun user_login(email: String, password: String,context: Context) {
+    fun user_login(email: String, password: String, context: Context, onResult: (String) -> Unit) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
@@ -104,7 +101,7 @@ class LoginViewModel : ViewModel() {
 
                 if (response.status == "success") {
                     loginState.value = response
-
+                    onResult(response.message)
 
                     val sessionManager = SessionManager(context)
 
@@ -118,38 +115,21 @@ class LoginViewModel : ViewModel() {
                     )
 
 
-//                    val sessionManager = SessionManager(context)
-//                    sessionManager.saveLogin(response.user_id, response.name)
-
                 } else {
                     errorMessage.value = response.message
-
+                    onResult(response.message)
 
 
                 }
 
             } catch (e: Exception) {
                 errorMessage.value = e.message ?: "Error"
+
             } finally {
                 isLoading.value = false
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

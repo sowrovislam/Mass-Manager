@@ -355,7 +355,7 @@ fun UserScreen(
                             )
                         },
                         visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         colors = getDashboardTextFieldColors()
@@ -372,8 +372,9 @@ fun UserScreen(
                     emailError = email.isBlank()
                     phoneError = phone.isBlank()
                     passwordError = password.isBlank()
+                    otpError=otpCode.isBlank()
 
-                    if (nameError || emailError || phoneError || passwordError) {
+                    if (nameError || emailError || phoneError || passwordError||otpError) {
                         Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
                         return@Button
                     }

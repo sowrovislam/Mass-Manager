@@ -33,6 +33,7 @@ fun GroceryListScreen(
     navController: NavController,
     viewModel: GroceryViewModel
 ) {
+    var showSaveDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val session = remember { SessionManager(context) }
     val ScheduleViewModel: ScheduleViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
@@ -84,7 +85,7 @@ fun GroceryListScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("🛒 বাজারের তালিকা", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                    Text("চলমান বাজার তালিকা", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colorResource(R.color.status_bar_green),
@@ -169,14 +170,16 @@ fun GroceryListScreen(
                     ) {
                         OutlinedTextField(
                             value = weightInput,
-                            onValueChange = { weightInput = it },
+                            onValueChange = { input ->
+                                weightInput = if (input.isEmpty()) "0" else input
+                            },
                             label = { Text("Weight/Qty") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1.2f),
                             enabled = EmailSame,
+                            singleLine = true,
                             shape = RoundedCornerShape(10.dp)
                         )
-
                         ExposedDropdownMenuBox(
                             expanded = expanded && EmailSame,
                             onExpandedChange = { if (EmailSame) expanded = !expanded },
@@ -189,7 +192,7 @@ fun GroceryListScreen(
                                 label = { Text("Unit") },
                                 trailingIcon = {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.baseline_email_24),
+                                        painter = painterResource(id = R.drawable.outline_arrow_drop_down_24),
                                         contentDescription = if (expanded) "Close Menu" else "Open Menu"
                                     )
                                 },
@@ -329,7 +332,7 @@ fun GroceryListScreen(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 IconButton(onClick = { groceryList.remove(item) }) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.baseline_email_24),
+                                        painter = painterResource(id = R.drawable.outline_delete_24),
                                         contentDescription = "Delete",
                                         tint = Color.Red
                                     )
@@ -345,12 +348,7 @@ fun GroceryListScreen(
             // 💾 SERVER SAVE SECTION
             Button(
                 onClick = {
-                    viewModel.saveAllItems(
-                        list = groceryList.toList(),
-                        name = userName,
-                        email = userEmail,
-                        userid = userId
-                    )
+                    showSaveDialog = true // বাটনে ক্লিক করলে ডায়ালগটি ওপেন হবে
                 },
                 enabled = groceryList.isNotEmpty() && !viewModel.loading.value && EmailSame,
                 modifier = Modifier.fillMaxWidth(),
@@ -362,6 +360,67 @@ fun GroceryListScreen(
                 } else {
                     Text("💾 Save All to Server", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
                 }
+            }
+
+// ৩. 💾 প্রিমিয়াম কনফার্মেশন অ্যালার্ট ডায়ালগ ইউআই
+            if (showSaveDialog) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showSaveDialog = false // ডায়ালগের বাইরে ক্লিক করলে বন্ধ হবে
+                    },
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "💾 ", fontSize = 22.sp)
+                            Text(
+                                text = "ডাটা সেভ নিশ্চিত করুন",
+                                fontWeight = FontWeight.ExtraBold,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color(0xFF2E7D32) // সুন্দর গ্রিন থিম টাইটেল
+                            )
+                        }
+                    },
+                    text = {
+                        Text(
+                            text = "আপনি কি এই তালিকার সব আইটেম সার্ভারে সেভ করতে চান? নিশ্চিত করতে নিচে ক্লিক করুন।",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showSaveDialog = false // প্রথমে ডায়ালগটি বন্ধ হবে
+
+                                // 🎯 সার্ভারে ডাটা সেভ করার আসল ফাংশন
+                                viewModel.saveAllItems(
+                                    list = groceryList.toList(),
+                                    name = userName,
+                                    email = userEmail,
+                                    userid = userId
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // গ্রিন কনফার্ম বাটন
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("হ্যাঁ, সেভ করুন", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showSaveDialog = false // ক্যানসেল করলে ডায়ালগ বন্ধ হবে
+                            }
+                        ) {
+                            Text(
+                                text = "না, ক্যানসেল",
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp), // মডার্ন কার্ভড ডায়ালগ কর্নার
+                    containerColor = Color.White // ব্যাকগ্রাউন্ড কালার হোয়াইট
+                )
             }
 
             // 📩 SERVER MESSAGE
