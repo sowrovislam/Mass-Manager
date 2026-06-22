@@ -40,48 +40,44 @@ fun SplashScreen(navController: NavController) {
 
     var startAnimation by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
-    var navigated by remember { mutableStateOf(false) }
 
     // Smooth scale animation (0.7f to 1.0f)
     val scale by animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0.7f,
-        animationSpec = tween(durationMillis = 1000),
+        animationSpec = tween(durationMillis = 1000), // ১ সেকেন্ড ধরে লোগো বড় হবে
         label = "LogoScale"
     )
 
     // Smooth fade-in animation (0f to 1.0f)
     val alpha by animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000),
+        animationSpec = tween(durationMillis = 800), // ৮০০ মিলিসেকেন্ডে লোগো ভেসে উঠবে
         label = "LogoAlpha"
     )
 
-    // Start network monitoring and trigger animation
+    // ১. অ্যাপ ওপেন হওয়া মাত্রই অ্যানিমেশন এবং নেটওয়ার্ক মনিটর চালু হবে (কোনো দেরি ছাড়া)
     LaunchedEffect(Unit) {
-        networkMonitor.start()
         startAnimation = true
+        networkMonitor.start()
     }
 
-    // Main splash routing logic
+    // ২. নেভিগেশন এবং ইন্টারনেটের লজিক আলাদা রাখা হয়েছে যেন লোগো দ্রুত শো করে
     LaunchedEffect(isConnected) {
-        if (navigated) startAnimation = true
-        delay(2000) // 2 seconds delay to enjoy the premium animation
+        // লোগো দেখার জন্য ব্যাকগ্রাউন্ডে ২ সেকেন্ড অপেক্ষা করবে
+        delay(1000)
 
         if (!isConnected) {
             showDialog = true
-            return@LaunchedEffect
-        }
-
-        val sessionManager = SessionManager(context)
-        navigated = true
-
-        if (sessionManager.isLoggedIn()) {
-            navController.navigate(Screen.dashboard.route) {
-                popUpTo(Screen.Splash.route) { inclusive = true }
-            }
         } else {
-            navController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Splash.route) { inclusive = true }
+            val sessionManager = SessionManager(context)
+            if (sessionManager.isLoggedIn()) {
+                navController.navigate(Screen.dashboard.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+            } else {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
             }
         }
     }
@@ -116,7 +112,6 @@ fun SplashScreen(navController: NavController) {
                 .scale(scale)
                 .alpha(alpha)
         ) {
-            // New Vector Logo Add
             Image(
                 painter = painterResource(id = R.drawable.ic_mess_manager_logo),
                 contentDescription = "Mess Manager Logo",
@@ -125,7 +120,6 @@ fun SplashScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Main App Name Title
             Text(
                 text = "Mess Manager",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -137,9 +131,8 @@ fun SplashScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // 🔥 DEVELOPER NAME SECTION
             Text(
-                text = "Developed by Md Sowrov Islam", // 👈 এখানে "Your Name" চেঞ্জ করে নিজের নাম বসিয়ে দিন
+                text = "Developed by Md Sowrov Islam",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium,
                     letterSpacing = 0.5.sp

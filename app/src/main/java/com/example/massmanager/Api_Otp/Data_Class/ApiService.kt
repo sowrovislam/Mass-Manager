@@ -117,6 +117,22 @@ interface ApiService {
     ): BasicResponse
 
 
+    // getlist
+
+
+
+    @FormUrlEncoded
+    @POST("get_meals_list.php")
+    suspend fun getMealsList(
+        @Field("userid") userid: String
+    ): MealResponseList
+
+
+    @FormUrlEncoded
+    @POST("grocery_list.php")
+    suspend fun getGroceryData(
+        @Field("userid") userId: String
+    ): GroceryResponse
 
 }
 

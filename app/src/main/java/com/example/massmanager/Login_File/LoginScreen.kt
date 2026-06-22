@@ -58,7 +58,7 @@ import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
 
 @Composable
-fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
+fun LoginScreen(navController: NavController,viewModel: LoginViewModel=viewModel()) {
 
 //    val viewMode: SignUpViewModel = viewModel()
 
@@ -198,6 +198,7 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
                 label = {
                     Text("Enter Email", color = Color.Black)
                 },
+                singleLine = true,
 
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email
@@ -241,9 +242,10 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
                 },
 
                 visualTransformation = PasswordVisualTransformation(),
+                singleLine = true,
 
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
+                    keyboardType = KeyboardType.Number
                 ),
 
                 leadingIcon = {
@@ -333,21 +335,21 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
 
                         "admin" -> {
 
-//                            val UserId= user?.id
-//                            val UserName= user?.name.toString()
-//                            val sessionManager = SessionManager(context)
-//                            sessionManager.saveLogin(UserId, UserName)
+//
 
-                            viewModel.admin_login(email, password,context)
-                            Toast.makeText(context, "${message}", Toast.LENGTH_SHORT).show()
+                            viewModel.admin_login(email, password,context,    onResult = { message ->
+                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            })
+
                         }
 
                         "user" -> {
 
-                            viewModel.user_login(email,password,context)
+                            viewModel.user_login(email,password,context   , onResult = { message ->
+                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            })
 
 
-                            Toast.makeText(context, "User Login", Toast.LENGTH_SHORT).show()
 
                         }else -> {
 
@@ -488,6 +490,5 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel) {
 @Composable
 fun loginui() {
     val navController = rememberNavController()
-     val viewModel= LoginViewModel()
-    LoginScreen(navController,viewModel)
+    LoginScreen(navController)
 }

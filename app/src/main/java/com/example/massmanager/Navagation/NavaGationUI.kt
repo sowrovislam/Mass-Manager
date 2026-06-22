@@ -17,10 +17,14 @@ import com.example.massmanager.ViewModel.SignUpViewModel
 import com.example.massmanager.Dashboard.ProfileScreen
 import com.example.massmanager.Dashboard.UserScreen
 import com.example.massmanager.Dashboard.dashboardScreen
+import com.example.massmanager.Loading_Data_List.GroceryListShowScreen
+import com.example.massmanager.Loading_Data_List.MealListScreen
+
 import com.example.massmanager.Login_File.ForgateScreen
 import com.example.massmanager.Login_File.LoginScreen
 import com.example.massmanager.Login_File.SignupScreen
 import com.example.massmanager.Login_File.SplashScreen
+import com.example.massmanager.ViewModel.GetMealViewModel
 import com.example.massmanager.ViewModel.GroceryViewModel
 import com.example.massmanager.ViewModel.MealViewModel
 import com.example.massmanager.ViewModel.ScheduleViewModel
@@ -107,6 +111,18 @@ fun NavigationUI(context: Context) {
             GroceryListScreen(navController,viewModel)
     }
 
+        composable(Screen.MealListScreen.route) {
+
+        val viewModel: GetMealViewModel = viewModel()
+            MealListScreen(navController,viewModel)
+    }
+
+        composable(Screen.GroceryListShow.route) {
+
+//        val viewModel: GetMealViewModel = viewModel()
+            GroceryListShowScreen(navController)
+    }
+
 
 }
 }
@@ -130,4 +146,8 @@ fun NavigationUI(context: Context) {
         object MealsData: Screen("MealsData")
 
         object GroceryListScreen: Screen("GroceryListScreen")
+
+        object MealListScreen: Screen("MealListScreen")
+
+        object GroceryListShow: Screen("GroceryListShowScreen")
     }

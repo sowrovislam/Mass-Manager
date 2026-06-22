@@ -2,6 +2,7 @@ package com.example.massmanager.Reprository
 
 
 import com.example.massmanager.Api_Otp.Data_Class.MealResponse
+import com.example.massmanager.Api_Otp.Data_Class.MealResponseList
 import com.example.massmanager.Api_Otp.Data_Class.MealsResponse
 import com.example.massmanager.Api_Otp.Data_Class.RetrofitClient
 
@@ -35,7 +36,9 @@ class MealRepository {
         RetrofitClient.api.deleteMeal(email, date)
 
 
-
+    suspend fun fetchMeals(userid: String): MealResponseList {
+        return RetrofitClient.api.getMealsList(userid)
+    }
 
 
 

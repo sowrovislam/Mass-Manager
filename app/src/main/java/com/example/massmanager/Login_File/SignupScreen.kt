@@ -335,7 +335,7 @@ fun SignupScreen(navController: NavController, viewModel: OtpViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("••••••••", color = Color.DarkGray) },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         leadingIcon = {
                             Icon(

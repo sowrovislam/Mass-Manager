@@ -140,7 +140,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
 
                 // ৩. বাজার তালিকা
                 NavigationDrawerItem(
-                    label = { Text("বাজার তালিকা") },
+                    label = { Text("বাজার কারীর সময়সূচি") },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -153,6 +153,43 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                 )
+
+
+
+                // 4. বাজার তালিকা
+                NavigationDrawerItem(
+                    label = { Text("চলমান সব মিল তালিকা") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate(Screen.MealListScreen.route)
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedContainerColor = Color.Transparent,
+                        unselectedTextColor = Color.White,
+                        unselectedIconColor = Color.White.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+          // 5. বাজার তালিকা
+                NavigationDrawerItem(
+                    label = { Text("বাজারের খরচ তালিকা") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate(Screen.GroceryListShow.route)
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedContainerColor = Color.Transparent,
+                        unselectedTextColor = Color.White,
+                        unselectedIconColor = Color.White.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+
+
+
             }
         }
     ){
@@ -323,19 +360,41 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
 
                             Column(modifier = Modifier.padding(20.dp)) {
 
-                                Text(
-                                    text = "🛒 আজকের বাজার",
-                                    color = Color(0xFF1B5E20),
-                                    style = MaterialTheme.typography.titleLarge
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "🛒 আজকের বাজার",
+                                        color = Color(0xFF113E15), // ডার্ক গ্রিন যা সহজে পড়া যায়
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    )
 
-                                Spacer(modifier = Modifier.height(12.dp))
-
+                                    // ডেটটিকে একটি ছোট মিনিমালিস্ট চিপের মতো লুক দেওয়া হয়েছে
+                                    Surface(
+                                        shape = RoundedCornerShape(50.dp),
+                                        color = Color(0xFFE1F0E3),
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = "চলতি দায়িত্ব",
+                                            color = Color(0xFF2E7D32),
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontWeight = FontWeight.Medium
+                                            ),
+                                            modifier = Modifier.padding(
+                                                horizontal = 12.dp,
+                                                vertical = 6.dp
+                                            )
+                                        )
+                                    }
+                                }
                                 HorizontalDivider(
-                                    color = Color(0xFF2E7D32).copy(alpha = 0.2f),
-                                    thickness = 1.dp
+                                    color = Color(0xFF2E7D32).copy(alpha = 0.1f),
+                                    thickness = 1.2.dp,
+                                    modifier = Modifier.padding(top =5.dp )
                                 )
-
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -347,7 +406,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "Name: ${today?.name ?: "N/A"}",
+                                        text = "নাম: ${today?.name ?: "N/A"}",
                                         color = Color.Black
                                     )
                                 }
@@ -362,7 +421,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Email: ${today?.email ?: "N/A"}",
+                                    Text("ইমেইল: ${today?.email ?: "N/A"}",
                                         color = Color.Black)
                                 }
 
@@ -376,7 +435,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Number: ${today?.number ?: "N/A"}",
+                                    Text("মোবাইল: ${today?.number ?: "N/A"}",
                                         color = Color.Black)
                                 }
 
@@ -447,7 +506,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                     }
                                 }
 
-//                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
 
                                 HorizontalDivider(
                                     color = Color(0xFF2E7D32).copy(alpha = 0.1f),
@@ -481,7 +540,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                             )
 
                                             Text(
-                                                text = "${summary?.total_dupur}টি",
+                                                text = "${summary?.total_dupur?: 0}টি",
                                                 color = Color(0xFF1B5E20),
                                                 style = MaterialTheme.typography.titleMedium.copy(
                                                     fontWeight = FontWeight.Bold
@@ -512,7 +571,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                             )
 
                                             Text(
-                                                text = "${summary?.total_rat} টি",
+                                                text = "${summary?.total_rat?: 0} টি",
                                                 color = Color(0xFF1B5E20),
                                                 style = MaterialTheme.typography.titleMedium.copy(
                                                     fontWeight = FontWeight.Bold
@@ -547,7 +606,7 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel) 
                                         )
 
                                         Text(
-                                            text = "${summary?.total_counter} টি",
+                                            text = "${summary?.total_counter ?: 0} টি",
                                             color = Color(0xFFFFF176),
                                             style = MaterialTheme.typography.headlineSmall.copy(
                                                 fontWeight = FontWeight.ExtraBold

@@ -48,22 +48,18 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
     val context = LocalContext.current
     val sessionManager = SessionManager(context)
 
+    // 🎯 ডাটাবেজ এবং UI উভয়ের জন্যই একই "dd MMMM, yyyy" ফরম্যাট ব্যবহার করা হলো
     val formattedDate = SimpleDateFormat(
         "dd MMMM, yyyy",
         Locale.getDefault()
     ).format(selectedDate)
-
-    val currentTime = remember {
-        SimpleDateFormat("hh:mm a", Locale.getDefault())
-            .format(Date())
-    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("প্রতিদিনের মিল", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(R.color.status_bar_green), // SAME as status bar
+                    containerColor = colorResource(R.color.status_bar_green),
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White,
                     navigationIconContentColor = Color.White
@@ -72,7 +68,6 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
         }
     ) { innerPadding ->
 
-        // ✅ ROOT BOX (Applied innerPadding here safely to fix AppBar layout rendering)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -84,7 +79,6 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-
 
                 Card(
                     shape = RoundedCornerShape(14.dp),
@@ -114,7 +108,7 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
                         )
                     }
                 }
-                // Reduced space slightly since TopAppBar already handles top positioning padding cleanly
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
@@ -124,7 +118,7 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
                 )
 
                 Text(
-                    text = "Current Time: $currentTime",
+                    text = "Sending Format: $formattedDate",
                     fontSize = 14.sp,
                     color = Color.Black
                 )
@@ -149,139 +143,73 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                // 🔹 COUNTER CARD (দুপুর ও রাত)
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
                 ) {
-                    Card(
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                        // 🔵 DUPUR COUNTER
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // 🔵 DUPUR COUNTER
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "দুপুর",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
+                            Text(text = "দুপুর", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(
+                                    onClick = { if (isDupurCounter > 0) isDupurCounter-- },
+                                    modifier = Modifier.size(40.dp).background(Color.White, CircleShape)
                                 ) {
-                                    IconButton(
-                                        onClick = {
-                                            if (isDupurCounter > 0) isDupurCounter--
-                                        },
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .background(Color.White, CircleShape)
-                                    ) {
-                                        Icon(
-                                            painterResource(R.drawable.outline_check_indeterminate_small_24),
-                                            contentDescription = "Decrease",
-                                            tint = Color.Red
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-
-                                    Text(
-                                        text = isDupurCounter.toString(),
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 8.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    IconButton(
-                                        onClick = { isDupurCounter++ },
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .background(Color.White, CircleShape)
-                                    ) {
-                                        Icon(
-                                            painterResource(R.drawable.outline_add_24),
-                                            contentDescription = "Increase",
-                                            tint = Color(0xFF4CAF50)
-                                        )
-                                    }
+                                    Icon(painterResource(R.drawable.outline_check_indeterminate_small_24), "Decrease", tint = Color.Red)
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(text = isDupurCounter.toString(), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                IconButton(
+                                    onClick = { isDupurCounter++ },
+                                    modifier = Modifier.size(40.dp).background(Color.White, CircleShape)
+                                ) {
+                                    Icon(painterResource(R.drawable.outline_add_24), "Increase", tint = Color(0xFF4CAF50))
                                 }
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
+                        }
 
-                            // 🔻 VERTICAL DIVIDER
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .height(80.dp)
-                                    .width(1.dp),
-                                color = Color.Gray
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        HorizontalDivider(modifier = Modifier.height(80.dp).width(1.dp), color = Color.Gray)
+                        Spacer(modifier = Modifier.width(12.dp))
 
-                            // 🔴 RAT COUNTER
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "রাত",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
-                                )
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
+                        // 🔴 RAT COUNTER
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "রাত", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(
+                                    onClick = { if (isRatCounter > 0) isRatCounter-- },
+                                    modifier = Modifier.size(40.dp).background(Color.White, CircleShape)
                                 ) {
-                                    IconButton(
-                                        onClick = {
-                                            if (isRatCounter > 0) isRatCounter--
-                                        },
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .background(Color.White, CircleShape)
-                                    ) {
-                                        Icon(
-                                            painterResource(R.drawable.outline_check_indeterminate_small_24),
-                                            contentDescription = "Decrease",
-                                            tint = Color.Red
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = isRatCounter.toString(),
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 8.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    IconButton(
-                                        onClick = { isRatCounter++ },
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .background(Color.White, CircleShape)
-                                    ) {
-                                        Icon(
-                                            painterResource(R.drawable.outline_add_24),
-                                            contentDescription = "Increase",
-                                            tint = Color(0xFF4CAF50)
-                                        )
-                                    }
+                                    Icon(painterResource(R.drawable.outline_check_indeterminate_small_24), "Decrease", tint = Color.Red)
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(text = isRatCounter.toString(), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                IconButton(
+                                    onClick = { isRatCounter++ },
+                                    modifier = Modifier.size(40.dp).background(Color.White, CircleShape)
+                                ) {
+                                    Icon(painterResource(R.drawable.outline_add_24), "Increase", tint = Color(0xFF4CAF50))
                                 }
                             }
                         }
@@ -304,6 +232,7 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
                                 return@clickable
                             }
 
+                            // 🛠️ "30 June, 2026" ফরম্যাটে ডেটা পাঠানোর জন্য formattedDate দেওয়া হলো
                             viewModel.addMeal(
                                 userid = userId.toString(),
                                 name = name ?: "Daily Meal",
@@ -324,37 +253,19 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
                     elevation = CardDefaults.cardElevation(6.dp)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text(
-                                text = "খাব (YES)",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF2E7D32)
-                            )
-                            Text(
-                                text = "I consumed milk/puja today",
-                                fontSize = 13.sp,
-                                color = Color.Gray
-                            )
+                            Text(text = "খাব (YES)", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                            Text(text = "I consumed meal today", fontSize = 13.sp, color = Color.Gray)
                         }
-
                         Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.LightGray, shape = RoundedCornerShape(50)),
+                            modifier = Modifier.size(40.dp).background(Color.LightGray, shape = RoundedCornerShape(50)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "✓",
-                                color = Color.White,
-                                fontSize = 18.sp
-                            )
+                            Text(text = "✓", color = Color.White, fontSize = 18.sp)
                         }
                     }
                 }
@@ -367,6 +278,8 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
                         .fillMaxWidth()
                         .clickable {
                             val email = sessionManager.GetEmail()
+
+                            // 🛠️ ডিলিট করার জন্যও formattedDate দেওয়া হলো
                             viewModel.deleteMeal(
                                 email = email.toString(),
                                 date = formattedDate,
@@ -382,58 +295,37 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
                     elevation = CardDefaults.cardElevation(6.dp)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Text(
-                                text = "খাব না (Delete)",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFC62828)
-                            )
-                            Text(
-                                text = "I skipped today",
-                                fontSize = 13.sp,
-                                color = Color.Gray
-                            )
+                            Text(text = "খাব না (Delete)", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC62828))
+                            Text(text = "I skipped today", fontSize = 13.sp, color = Color.Gray)
                         }
-
                         Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(
-                                    if (selected == "NO") Color(0xFFC62828) else Color.LightGray,
-                                    shape = RoundedCornerShape(50)
-                                ),
+                            modifier = Modifier.size(40.dp).background(
+                                if (selected == "NO") Color(0xFFC62828) else Color.LightGray,
+                                shape = RoundedCornerShape(50)
+                            ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = if (selected == "NO") "✓" else "×",
-                                color = Color.White,
-                                fontSize = 18.sp
-                            )
+                            Text(text = if (selected == "NO") "✓" else "×", color = Color.White, fontSize = 18.sp)
                         }
                     }
                 }
             }
 
-            // ✅ ২য় প্রোগ্রেস বার কন্ডিশন (Add অথবা Delete যেকোনো একটা কাজ করলেই স্ক্রিন লক হবে)
+            // ✅ স্ক্রিন লকিং প্রোগ্রেস বার
             if (loading || LoadingDalate) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black.copy(alpha = 0.4f))
-                        .clickable(enabled = false) { }, // ব্যাকগ্রাউন্ড ক্লিক টোটাল বন্ধ রাখবে
+                        .clickable(enabled = false) { },
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        strokeWidth = 4.dp
-                    )
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 4.dp)
                 }
             }
         }
@@ -458,12 +350,4 @@ fun DailyMeal(navController: NavController, viewModel: MealViewModel) {
             show()
         }
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun login() {
-    val navController = rememberNavController()
-    val viewModel = MealViewModel()
-    DailyMeal(navController, viewModel)
 }
