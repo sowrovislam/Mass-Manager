@@ -42,7 +42,7 @@ fun MealListScreen(navController: NavController, viewModel: GetMealViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("চলমান সব মিল তালিকা", fontWeight = FontWeight.SemiBold) },
+                title = { Text("চলমান সব মিল তালিক", fontWeight = FontWeight.SemiBold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
