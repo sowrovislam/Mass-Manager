@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.massmanager.Api_Otp.Data_Class.DataMail
 import com.example.massmanager.Api_Otp.Data_Class.MealMonthGroup
@@ -26,7 +27,7 @@ import com.example.massmanager.ViewModel.GetMealViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MealListScreen(navController: NavController, viewModel: GetMealViewModel) {
+fun MealListScreen(navController: NavController, viewModel: GetMealViewModel= viewModel()) {
 
     val meals by viewModel.meals.collectAsState()
     val total by viewModel.totalMeal.collectAsState()
