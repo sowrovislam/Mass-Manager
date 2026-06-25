@@ -117,7 +117,34 @@ interface ApiService {
     ): BasicResponse
 
 
+    @FormUrlEncoded
+    @POST("get_meals_list.php")
+    suspend fun getMealsList(
+        @Field("userid") userid: String
+    ): MealResponseList
 
+
+    @FormUrlEncoded
+    @POST("grocery_list.php")
+    suspend fun getGroceryData(
+        @Field("userid") userId: String
+    ): GroceryResponse
+
+
+
+
+
+    @FormUrlEncoded
+    @POST("meal_rate_total _summary.php")
+    suspend fun getReport(
+        @Field("userid") userid: String
+    ): ReportResponse
+
+
+    @POST("total_meal_total_data.php")
+    suspend fun getMealReport(
+        @Body request: Map<String, String>
+    ): MealReportResponse
 }
 
 object RetrofitClient {

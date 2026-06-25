@@ -19,6 +19,8 @@ import com.example.massmanager.Dashboard.UserScreen
 import com.example.massmanager.Dashboard.dashboardScreen
 import com.example.massmanager.Loading_Data_List.GroceryListShowScreen
 import com.example.massmanager.Loading_Data_List.MealListScreen
+import com.example.massmanager.Loading_Data_List.TotalMealListScreen
+import com.example.massmanager.Loading_Data_List.TotalMealRetScreen
 
 import com.example.massmanager.Login_File.ForgateScreen
 import com.example.massmanager.Login_File.LoginScreen
@@ -123,6 +125,18 @@ fun NavigationUI(context: Context) {
             GroceryListShowScreen(navController)
     }
 
+        composable(Screen.TotalMealRet.route) {
+
+
+            TotalMealRetScreen(navController)
+    }
+
+        composable(Screen.TotalMealList.route) {
+
+
+            TotalMealListScreen(navController)
+    }
+
 
 }
 }
@@ -150,4 +164,12 @@ fun NavigationUI(context: Context) {
         object MealListScreen: Screen("MealListScreen")
 
         object GroceryListShow: Screen("GroceryListShowScreen")
+
+
+        object TotalMealRet: Screen("TotalMealRet")
+
+        object TotalMealList: Screen("TotalMealList")
+
+
+
     }
