@@ -1,5 +1,8 @@
 package com.example.massmanager.ViewModel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.massmanager.Api_Otp.Data_Class.AuthRepository
@@ -98,6 +101,27 @@ class OtpViewModel : ViewModel() {
 
 
 
+
+        private val repo = AuthRepository()
+
+        var loading1 by mutableStateOf(false)
+        var message1 by mutableStateOf("")
+
+        fun resetPassword(email: String, pass: String, onSuccess: () -> Unit) {
+            viewModelScope.launch {
+                loading1 = true
+                try {
+                    val res = repo.resetPassword(email, pass)
+                    message1 = res.message
+                    if (res.status) {
+                        onSuccess()
+                    }
+                } catch (e: Exception) {
+                    message1 = e.localizedMessage ?: "Something went wrong"
+                }
+                loading1 = false
+            }
+        }
 
 
 
