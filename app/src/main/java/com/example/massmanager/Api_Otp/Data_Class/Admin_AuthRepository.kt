@@ -37,7 +37,9 @@ class AuthRepository {
     }
 
 
-
+    suspend fun resetPassword(email: String, password: String): ForgotResponse {
+        return RetrofitClient.api.resetPassword(email, password)
+    }
 
 
 

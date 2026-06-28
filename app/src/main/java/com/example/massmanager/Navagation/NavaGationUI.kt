@@ -19,6 +19,7 @@ import com.example.massmanager.Dashboard.UserScreen
 import com.example.massmanager.Dashboard.dashboardScreen
 import com.example.massmanager.Loading_Data_List.GroceryListShowScreen
 import com.example.massmanager.Loading_Data_List.MealListScreen
+import com.example.massmanager.Loading_Data_List.PaymentScreen
 import com.example.massmanager.Loading_Data_List.TotalMealListScreen
 import com.example.massmanager.Loading_Data_List.TotalMealRetScreen
 
@@ -85,6 +86,8 @@ fun NavigationUI(context: Context) {
         }
 
 
+
+
     composable(Screen.Users.route) {
 
         val viewModel: SignUpViewModel = viewModel()
@@ -137,6 +140,12 @@ fun NavigationUI(context: Context) {
             TotalMealListScreen(navController)
     }
 
+        composable(Screen.Payment.route) {
+
+
+            PaymentScreen(navController)
+    }
+
 
 }
 }
@@ -169,6 +178,10 @@ fun NavigationUI(context: Context) {
         object TotalMealRet: Screen("TotalMealRet")
 
         object TotalMealList: Screen("TotalMealList")
+
+      object Payment: Screen("PaymentScreen")
+
+        object EditUser : Screen("edit_user/{name}/{email}/{number}")
 
 
 

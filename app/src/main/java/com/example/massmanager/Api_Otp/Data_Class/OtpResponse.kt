@@ -108,3 +108,9 @@ data class DeleteMealResponse(
     val success: Boolean,
     val message: String
 )
+
+
+data class ForgotResponse(
+    val status: Boolean,
+    val message: String
+)

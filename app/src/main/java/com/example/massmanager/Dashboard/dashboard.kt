@@ -130,11 +130,11 @@ fun dashboardScreen(navController: NavController, viewModel: ScheduleViewModel= 
 
                 // ২. প্রোফাইল
                 NavigationDrawerItem(
-                    label = { Text("প্রোফাইল") },
+                    label = { Text("পেমেন্ট") },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
-                        navController.navigate(Screen.Profile.route)
+                        navController.navigate(Screen.Payment.route)
                     },
                     colors = NavigationDrawerItemDefaults.colors(
                         unselectedContainerColor = Color.Transparent,

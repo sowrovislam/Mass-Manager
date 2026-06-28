@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.massmanager.Api_Otp.Data_Class.SessionManager
 import com.example.massmanager.Navigation.Screen
 import com.example.massmanager.R
+import android.net.Uri
 import com.example.massmanager.ViewModel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -258,12 +259,13 @@ fun ProfileScreen(
 
                                         Button(
                                             onClick = {
-                                                userViewModel.deleteUser(user.email, currentUserId)
-                                                // 💡 ডিলিট করার পর লিস্ট রিফ্রেশ করার জন্য আবার কল করতে পারেন:
-                                                // userViewModel.loadUsers(currentUserId)
+
                                             },
                                             modifier = Modifier.weight(1f),
-                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(
+                                                0xFF00BCD4
+                                            )
+                                            ),
                                             shape = RoundedCornerShape(8.dp)
                                         ) {
                                             Text("Update", color = Color.White)
